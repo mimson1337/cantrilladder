@@ -1,0 +1,10 @@
+<h2>Pytanie {{ question_number }} / {{ total_questions }}</h2>
+<p>{{ question }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  <input type="range" name="answer" min="0" max="10" step="1" value="5" oninput="this.nextElementSibling.value = this.value">
+  <output>5</output>
+  <br><br>
+  <button type="submit">Dalej</button>
+</form>

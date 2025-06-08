@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ocena zdrowia (Drabina Cantrila)</title>
+</head>
+<body>
+    <h2>Formularz pacjenta</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label>PESEL:</label><br>
+        <input type="text" name="pesel" maxlength="11" required><br><br>
+
+        <label>Ocena (0-10):</label><br>
+        <input type="number" name="score" min="0" max="10" required><br><br>
+
+        <label>Kontekst:</label><br>
+        <select name="context">
+            <option value="admission">Przyjęcie</option>
+            <option value="discharge">Wypis</option>
+            <option value="followup">Follow-up</option>
+        </select><br><br>
+
+        <label>Notatki (opcjonalnie):</label><br>
+        <textarea name="notes"></textarea><br><br>
+
+        <button type="submit">Wyślij</button>
+    </form>
+
+    {% if message %}
+        <p style="color:green;">{{ message }}</p>
+    {% endif %}
+</body>
+</html>
