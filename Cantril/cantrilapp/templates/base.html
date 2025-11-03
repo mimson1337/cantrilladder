@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Cantril App{% endblock %}</title>
+  <style>
+    /* Prosty, czytelny styl "tablet-friendly" - możesz potem przenieść do static/css */
+    body { font-family: Arial, Helvetica, sans-serif; background:#f5f7fb; margin:0; padding:0; }
+    header { background:#0b5ed7; color:white; padding:0.8rem 1rem; display:flex; justify-content:space-between; align-items:center; }
+    header a { color:white; text-decoration:none; margin-left:1rem; }
+    nav a { margin-right:1rem; color:white; text-decoration:none; font-weight:600; }
+    main { padding:1.25rem; max-width:980px; margin: 1rem auto; }
+    .card { background:white; padding:1rem; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,0.06); }
+    .btn { display:inline-block; padding:0.8rem 1rem; border-radius:8px; background:#0b5ed7; color:white; border:none; cursor:pointer; font-weight:600; }
+    .btn:active { transform:translateY(1px); }
+    input, select, textarea { font-size:1rem; padding:0.6rem; border:1px solid #ccc; border-radius:6px; width:100%; box-sizing:border-box; }
+    label { font-weight:700; display:block; margin-bottom:0.4rem; }
+    .center { text-align:center; }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <div>
+      <a href="{% url 'home' %}" style="font-size:1.1rem; font-weight:700">Cantril</a>
+    </div>
+    <nav>
+      <a href="{% url 'ankieta_start' %}">Ankieta</a>
+      <a href="{% url 'admin:index' %}">Admin</a>
+      <!-- jeśli dodasz panel pielęgniarki, dodaj link np. /panel/ -->
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer style="text-align:center; padding:1rem; color:#666;">
+    © Cantril Ladder
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Dziękujemy{% endblock %}
+
+{% block content %}
+  <h2 class="center">Dziękujemy za wypełnienie ankiety</h2>
+  <p>Twoje odpowiedzi zostały zapisane.</p>
+  <div style="margin-top:1rem;">
+    <a class="btn" href="{% url 'home' %}">Powrót do strony głównej</a>
+  </div>
+{% endblock %}

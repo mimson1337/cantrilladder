@@ -1,3 +1,10 @@
-<h1>Witaj</h1>
-<a href="{% url 'ankieta_start' %}">Rozpocznij ankietę</a>
-{% comment %} <a href="{% url 'wyniki' %}">Zobacz wyniki</a> {% endcomment %}
+{% extends 'base.html' %}
+{% block title %}Strona główna - Cantril{% endblock %}
+
+{% block content %}
+  <h1 class="center">Witaj w systemie Cantril</h1>
+  <p class="center">Służy do cyfrowego zbierania ocen metodą drabiny Cantrila.</p>
+  <div style="text-align:center; margin-top:1rem;">
+    <a class="btn" href="{% url 'ankieta_start' %}">Rozpocznij ankietę</a>
+  </div>
+{% endblock %}

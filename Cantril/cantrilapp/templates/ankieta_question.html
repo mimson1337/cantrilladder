@@ -1,10 +1,22 @@
-<h2>Pytanie {{ question_number }} / {{ total_questions }}</h2>
-<p>{{ question }}</p>
+{% extends 'base.html' %}
+{% block title %}Pytanie {{ question_number }} / {{ total_questions }}{% endblock %}
 
-<form method="post">
-  {% csrf_token %}
-  <input type="range" name="answer" min="0" max="10" step="1" value="5" oninput="this.nextElementSibling.value = this.value">
-  <output>5</output>
-  <br><br>
-  <button type="submit">Dalej</button>
-</form>
+{% block content %}
+  <h2 class="center">Pytanie {{ question_number }} / {{ total_questions }}</h2>
+  <p style="font-size:1.15rem;">{{ question }}</p>
+
+  <form method="post" style="margin-top:1rem;">
+    {% csrf_token %}
+    <label for="answer">Twoja ocena</label>
+    <input id="answer" type="range" name="answer" min="0" max="10" step="1" value="5" oninput="document.getElementById('out').value = this.value">
+    <output id="out">5</output>
+
+    <div style="margin-top:1rem; display:flex; gap:0.6rem;">
+      <button class="btn" type="submit">Dalej</button>
+    </div>
+  </form>
+
+  {% if error %}
+    <p style="color:red; margin-top:0.7rem;">{{ error }}</p>
+  {% endif %}
+{% endblock %}

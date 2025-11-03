@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Formularz pacjenta - Cantril{% endblock %}
+
+{% block content %}
+  <h2 class="center">Formularz pacjenta</h2>
+  <form method="post" style="max-width:520px; margin:0 auto;">
+      {% csrf_token %}
+      <label>PESEL:</label>
+      <input type="text" name="pesel" maxlength="11" required>
+
+      <label style="margin-top:0.75rem;">Ocena (0-10):</label>
+      <input type="number" name="score" min="0" max="10" required>
+
+      <label style="margin-top:0.75rem;">Kontekst:</label>
+      <select name="context">
+          <option value="admission">Przyjęcie</option>
+          <option value="discharge">Wypis</option>
+          <option value="followup">Follow-up</option>
+      </select>
+
+      <label style="margin-top:0.75rem;">Notatki (opcjonalnie):</label>
+      <textarea name="notes" rows="4"></textarea>
+
+      <div style="margin-top:1rem; text-align:center;">
+        <button class="btn" type="submit">Wyślij</button>
+      </div>
+  </form>
+
+  {% if message %}
+    <p style="color:green; margin-top:1rem;" class="center">{{ message }}</p>
+  {% endif %}
+{% endblock %}
