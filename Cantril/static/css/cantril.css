@@ -1,0 +1,35 @@
+/* Core layout and components for Cantril app */
+:root{
+  --primary:#0b5ed7;
+  --primary-dark:#0a58ca;
+  --muted:#eef3ff;
+  --card-bg:#fff;
+  --bg:#f5f7fb;
+  --text:#222;
+}
+
+html,body{height:100%;}
+body{font-family:Inter, Arial, Helvetica, sans-serif; background:var(--bg); margin:0; padding:0; color:var(--text);}
+header{background:var(--primary); color:white; padding:0.8rem 1rem; display:flex; justify-content:space-between; align-items:center;}
+header a{color:white; text-decoration:none; margin-left:1rem;}
+nav a{margin-right:1rem; color:white; text-decoration:none; font-weight:600}
+main{padding:1.25rem; max-width:980px; margin:1rem auto}
+.card{background:var(--card-bg); padding:1rem; border-radius:10px; box-shadow:0 6px 18px rgba(11,94,215,0.06)}
+.btn{display:inline-block; padding:0.7rem 1rem; border-radius:8px; background:var(--primary); color:white; border:none; cursor:pointer; font-weight:700}
+.btn:active{transform:translateY(1px)}
+input,select,textarea{font-size:1rem; padding:0.6rem; border:1px solid #d7dbe9; border-radius:6px; width:100%; box-sizing:border-box}
+label{font-weight:700; display:block; margin-bottom:0.4rem}
+.center{text-align:center}
+
+/* Ladder specific styles */
+#ladder-visual{background:transparent}
+.ladder-step{transition:all .18s ease; border:1px solid #d0daf8; background:#fff; color:var(--text)}
+.ladder-step[aria-checked="true"]{background:linear-gradient(180deg,var(--primary),var(--primary-dark)); color:white; box-shadow:0 4px 10px rgba(11,94,215,0.14); transform:translateY(-2px)}
+
+.site-footer{text-align:center; padding:1rem; color:#666}
+
+/* Responsive tweaks */
+@media (max-width:480px){
+  #ladder-visual{width:120px; height:360px}
+  .ladder-step{width:96px}
+}

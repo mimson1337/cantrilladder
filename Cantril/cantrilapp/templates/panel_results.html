@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Wyniki ankiet{% endblock %}
+
+{% block content %}
+  <h1 class="center">Wyniki ankiet</h1>
+  {% for p in patients %}
+    <div class="card" style="margin-top:0.75rem;">
+      <strong>{{ p.pesel }}</strong> {% if p.first_name or p.last_name %}- {{ p.first_name }} {{ p.last_name }}{% endif %}
+      <div style="font-size:0.9rem; color:#666;">Utworzony: {{ p.created_at }}</div>
+      <ul style="margin-top:0.5rem;">
+        {% for r in p.responses.all %}
+          <li>{{ r.timestamp }} — <strong>{{ r.score }}</strong> — {{ r.context }}</li>
+        {% empty %}
+          <li style="color:#666;">Brak zapisanych odpowiedzi</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% empty %}
+    <p>Brak pacjentów w systemie.</p>
+  {% endfor %}
+{% endblock %}

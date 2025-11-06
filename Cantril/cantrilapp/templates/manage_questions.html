@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Zarządzaj pytaniami{% endblock %}
+
+{% block content %}
+  <h1 class="center">Zarządzanie pytaniami</h1>
+  <div class="card" style="margin-bottom:1rem;">
+    <form method="post">
+      {% csrf_token %}
+      <label>Treść pytania</label>
+      <textarea name="text" rows="3" required></textarea>
+      <label style="margin-top:0.5rem;">Kolejność (liczba)</label>
+      <input type="number" name="order" min="0" value="0">
+      <div style="margin-top:0.6rem; text-align:center;">
+        <button class="btn" type="submit">Dodaj pytanie</button>
+      </div>
+    </form>
+  </div>
+
+  <h3>Istniejące pytania</h3>
+  <ul>
+    {% for q in questions %}
+      <li style="margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center;">
+        <div>{{ q.order }}. {{ q.text }}</div>
+        <form method="post" style="margin:0;">
+          {% csrf_token %}
+          <input type="hidden" name="question_id" value="{{ q.id }}">
+          <input type="hidden" name="action" value="delete">
+          <button class="btn" type="submit" style="background:#dc3545;">Usuń</button>
+        </form>
+      </li>
+    {% empty %}
+      <li>Brak pytań w bazie. System pokazuje domyślną listę z kodu.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

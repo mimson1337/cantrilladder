@@ -4,14 +4,41 @@
 {% block content %}
   <h2 class="center">Pytanie {{ question_number }} / {{ total_questions }}</h2>
   <p style="font-size:1.15rem;">{{ question }}</p>
-
   <form method="post" style="margin-top:1rem;">
     {% csrf_token %}
-    <label for="answer">Twoja ocena</label>
-    <input id="answer" type="range" name="answer" min="0" max="10" step="1" value="5" oninput="document.getElementById('out').value = this.value">
-    <output id="out">5</output>
 
-    <div style="margin-top:1rem; display:flex; gap:0.6rem;">
+    <label for="answer" style="display:block; margin-bottom:0.5rem; font-weight:700;">Twoja ocena</label>
+
+    <!-- Vertical ladder visual -->
+    <div style="display:flex; justify-content:center;">
+      <div id="ladder-visual" style="position:relative; width:160px; height:420px;">
+        <!-- rails -->
+        <div style="position:absolute; left:28px; top:8px; bottom:8px; width:8px; background:#d0daf8; border-radius:4px;"></div>
+        <div style="position:absolute; right:28px; top:8px; bottom:8px; width:8px; background:#d0daf8; border-radius:4px;"></div>
+
+        <div id="ladder" aria-label="Skala Cantril 1 do 10" role="radiogroup" style="position:relative; display:flex; flex-direction:column-reverse; gap:10px; align-items:center; justify-content:space-between; height:100%; padding:12px 0;">
+          <button type="button" class="ladder-step" data-value="1" aria-checked="false" role="radio" title="1" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">1</button>
+          <button type="button" class="ladder-step" data-value="2" aria-checked="false" role="radio" title="2" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">2</button>
+          <button type="button" class="ladder-step" data-value="3" aria-checked="false" role="radio" title="3" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">3</button>
+          <button type="button" class="ladder-step" data-value="4" aria-checked="false" role="radio" title="4" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">4</button>
+          <button type="button" class="ladder-step" data-value="5" aria-checked="false" role="radio" title="5" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">5</button>
+          <button type="button" class="ladder-step" data-value="6" aria-checked="false" role="radio" title="6" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">6</button>
+          <button type="button" class="ladder-step" data-value="7" aria-checked="false" role="radio" title="7" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">7</button>
+          <button type="button" class="ladder-step" data-value="8" aria-checked="false" role="radio" title="8" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">8</button>
+          <button type="button" class="ladder-step" data-value="9" aria-checked="false" role="radio" title="9" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">9</button>
+          <button type="button" class="ladder-step" data-value="10" aria-checked="false" role="radio" title="10" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">10</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:0.5rem;">
+      <output id="out" style="font-size:1.25rem; font-weight:800;">5</output>
+    </div>
+
+    <!-- Hidden input used for form submission -->
+    <input id="answer_input" type="hidden" name="answer" value="5">
+
+    <div style="margin-top:1rem; display:flex; gap:0.6rem; justify-content:center;">
       <button class="btn" type="submit">Dalej</button>
     </div>
   </form>
@@ -20,3 +47,5 @@
     <p style="color:red; margin-top:0.7rem;">{{ error }}</p>
   {% endif %}
 {% endblock %}
+
+  {% block scripts %}{% endblock %}
