@@ -17,12 +17,29 @@ class PatientResponse(models.Model):
         ('followup', 'Follow-up'),
     ]
 
+    # Optional link to a Question (if the project stores questions in DB)
+    # We'll keep context as a free text field to allow 'Pytanie X' entries.
+    class Meta:
+        ordering = ['-timestamp']
+
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='responses')
     score = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    context = models.CharField(max_length=20, choices=CONTEXT_CHOICES)
+    question = models.ForeignKey('Question', null=True, blank=True, on_delete=models.SET_NULL, related_name='question_responses')
+    context = models.CharField(max_length=100, blank=True)
     notes = models.TextField(blank=True, null=True)
     is_synced_with_his = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.patient.pesel} ({self.score}) {self.context}"
+
+
+class Question(models.Model):
+    text = models.TextField()
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.order}. {self.text[:60]}"
