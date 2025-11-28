@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Generator Ankiety{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    
+    <h1 class="center">Generator Pytań</h1>
+    <p class="center" style="color: #666; margin-bottom: 30px;">
+        Tutaj możesz edytować pytania, które zobaczą pacjenci.
+    </p>
+
+    <form method="POST" style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 25px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tytuł ankiety:</label>
+            <input type="text" name="title" value="{{ data.title|default:'Ankieta Cantrila' }}" 
+                   style="width: 100%; padding: 10px; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+        </div>
+        
+        <h3 style="border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">Pytania:</h3>
+        
+        <div id="questions-container">
+            {% for question in data.questions %}
+            <div class="question-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="text" name="questions" value="{{ question }}" required
+                       style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                
+                <button type="button" class="btn" onclick="removeField(this)"
+                        style="background-color: #dc3545; border-color: #dc3545; padding: 0 20px;">
+                    Usuń
+                </button>
+            </div>
+            {% empty %}
+            <div class="question-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="text" name="questions" placeholder="Wpisz treść pytania..." required
+                       style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <button type="button" class="btn" onclick="removeField(this)"
+                        style="background-color: #dc3545; border-color: #dc3545; padding: 0 20px;">
+                    Usuń
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 15px;">
+            <button type="button" class="btn" onclick="addField()" 
+                    style="background-color: #6c757d; border-color: #6c757d; font-size: 0.9rem;">
+                + Dodaj kolejne pytanie
+            </button>
+        </div>
+
+        <hr style="margin: 30px 0;">
+
+        <div style="text-align: center;">
+            <button type="submit" class="btn" style="padding: 15px 40px; font-size: 1.2rem;">
+                💾 Zapisz całą ankietę
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function addField() {
+        const container = document.getElementById('questions-container');
+        
+        // Tworzymy kontener rzędu (div)
+        const div = document.createElement('div');
+        div.className = 'question-row';
+        div.style.display = 'flex';
+        div.style.gap = '10px';
+        div.style.marginBottom = '10px';
+        
+        // Tworzymy input
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'questions';
+        input.placeholder = 'Wpisz treść pytania...';
+        input.required = true;
+        // Style inputa (muszą być takie same jak w HTML wyżej)
+        input.style.flexGrow = '1';
+        input.style.padding = '10px';
+        input.style.border = '1px solid #ccc';
+        input.style.borderRadius = '4px';
+        
+        // Tworzymy przycisk
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn'; // Twoja klasa z base.html
+        btn.innerText = 'Usuń';
+        btn.onclick = function() { removeField(btn); };
+        // Style przycisku (czerwony)
+        btn.style.backgroundColor = '#dc3545';
+        btn.style.borderColor = '#dc3545';
+        btn.style.padding = '0 20px';
+        btn.style.color = 'white';
+        btn.style.cursor = 'pointer';
+        
+        // Składamy całość
+        div.appendChild(input);
+        div.appendChild(btn);
+        container.appendChild(div);
+    }
+
+    function removeField(btn) {
+        // Usuwamy rząd, w którym jest przycisk
+        btn.parentElement.remove();
+    }
+</script>
+{% endblock %}

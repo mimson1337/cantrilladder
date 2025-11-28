@@ -2,9 +2,24 @@
 {% block title %}Strona główna - Cantril{% endblock %}
 
 {% block content %}
+
+  {% if messages %}
+    {% for message in messages %}
+      <div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; margin: 20px auto; border-radius: 5px; max-width: 600px; text-align: center;">
+          {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
   <h1 class="center">Witaj w systemie Cantril</h1>
   <p class="center">Służy do cyfrowego zbierania ocen metodą drabiny Cantrila.</p>
-  <div style="text-align:center; margin-top:1rem;">
+
+  <div style="text-align:center; margin-top:2rem;">
     <a class="btn" href="{% url 'ankieta_start' %}">Rozpocznij ankietę</a>
+
+    <br><br>
+
+    <a class="btn" href="{% url 'manage_questions' %}" style="background-color: #6c757d; border-color: #6c757d;">
+        ⚙️ Panel Lekarza (Generator)
+    </a>
   </div>
 {% endblock %}
