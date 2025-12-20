@@ -5,9 +5,10 @@ urlpatterns = [
     # Strona startowa
     path('', views.home, name='home'),
 
-    # Ścieżki dla pacjenta (Ankieta)
-    path('ankieta/start/', views.ankieta_start, name='ankieta_start'),
-    path('ankieta/question/<int:question_number>/', views.ankieta_question, name='ankieta_question'),
+    # Ścieżki dla pacjenta (Ankieta) - nowy wybór trybu i rozdzielone flow
+    path('ankieta/start/', views.ankieta_choice, name='ankieta_choice'),
+    path('ankieta/cantril/question/<int:question_number>/', views.ankieta_cantril_question, name='ankieta_cantril_question'),
+    path('ankieta/voice/question/<int:question_number>/', views.ankieta_voice_question, name='ankieta_voice_question'),
     path('ankieta/done/', views.ankieta_done, name='ankieta_done'),
 
     # Stary formularz (opcjonalny)
@@ -16,8 +17,10 @@ urlpatterns = [
     # --- NOWOŚĆ: Generator ankiety dla lekarza ---
     # To połączy adres /generator/ z widokiem manage_questions w views.py
     path('generator/', views.manage_questions, name='manage_questions'),
+    # Panel lekarza
+    path('panel/', views.panel_home, name='panel_home'),
+    path('panel/results/', views.panel_results, name='panel_results'),
 
-    # panel pielęgniarki (zakomentowane - na przyszłość)
-    # path('panel/', views.panel_home, name='panel_home'),
-    # path('panel/results/', views.panel_results, name='panel_results'),
+    # Webhook endpoint for n8n results
+    path('webhook/n8n/results/', views.n8n_results_webhook, name='n8n_results_webhook'),
 ]

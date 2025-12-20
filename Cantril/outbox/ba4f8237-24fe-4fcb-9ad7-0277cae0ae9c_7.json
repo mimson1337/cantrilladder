@@ -1,0 +1,47 @@
+[
+  {
+    "patientID": "7",
+    "surveyID": "ba4f8237-24fe-4fcb-9ad7-0277cae0ae9c",
+    "questionID": "q1",
+    "question": "",
+    "responseType": "audio",
+    "textAnswer": null,
+    "audioFile": "/audio_answers/19d4052fef6f4507befb4754f66528b6_response.webm"
+  },
+  {
+    "patientID": "7",
+    "surveyID": "ba4f8237-24fe-4fcb-9ad7-0277cae0ae9c",
+    "questionID": "q2",
+    "question": "",
+    "responseType": "audio",
+    "textAnswer": null,
+    "audioFile": "/audio_answers/078a7ce4c1eb4a739bf5d64c7ae5c6dc_response.webm"
+  },
+  {
+    "patientID": "7",
+    "surveyID": "ba4f8237-24fe-4fcb-9ad7-0277cae0ae9c",
+    "questionID": "q3",
+    "question": "",
+    "responseType": "audio",
+    "textAnswer": null,
+    "audioFile": "/audio_answers/3427ba2bf6044885a17bd9919d88975c_response.webm"
+  },
+  {
+    "patientID": "7",
+    "surveyID": "ba4f8237-24fe-4fcb-9ad7-0277cae0ae9c",
+    "questionID": "q4",
+    "question": "",
+    "responseType": "audio",
+    "textAnswer": null,
+    "audioFile": "/audio_answers/3cd24d2802204355b7459018c75fa61b_response.webm"
+  },
+  {
+    "patientID": "7",
+    "surveyID": "ba4f8237-24fe-4fcb-9ad7-0277cae0ae9c",
+    "questionID": "q5",
+    "question": "",
+    "responseType": "audio",
+    "textAnswer": null,
+    "audioFile": "/audio_answers/487dbb01d9434c4980312cfbcf78321a_response.webm"
+  }
+]

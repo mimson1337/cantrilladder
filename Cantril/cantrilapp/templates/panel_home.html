@@ -1,14 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}Panel - Cantril{% endblock %}
+{% block title %}Panel lekarza{% endblock %}
 
 {% block content %}
-  <h1 class="center">Panel zarządzania</h1>
-  <div style="display:flex; gap:0.6rem; justify-content:center; margin:1rem 0;">
-    <a class="btn" href="{% url 'manage_questions' %}">Pytania</a>
-    <a class="btn" href="{% url 'manage_patients' %}">Pacjenci</a>
-    <a class="btn" href="{% url 'panel_results' %}">Wyniki</a>
-  </div>
-  <div class="card center">
-    <p>Wybierz zakładkę, aby przeglądać i zarządzać elementami systemu.</p>
+  <h2 class="center">Panel lekarza</h2>
+  <div style="text-align:center; margin-top:1.5rem; display:flex; gap:12px; justify-content:center;">
+    <a class="btn" href="{% url 'manage_questions' %}">Generator ankiety</a>
+    <a class="btn" href="{% url 'panel_results' %}" style="background:#2563eb; border-color:#2563eb;">Sprawdź odpowiedzi</a>
   </div>
 {% endblock %}

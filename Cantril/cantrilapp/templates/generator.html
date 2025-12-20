@@ -24,7 +24,7 @@
         <div id="questions-container">
             {% for question in data.questions %}
             <div class="question-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <input type="text" name="questions" value="{{ question }}" required
+                <input type="text" name="questions" value="{{ question.text|default:question }}" required
                        style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                 
                 <button type="button" class="btn" onclick="removeField(this)"

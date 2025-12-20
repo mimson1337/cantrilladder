@@ -10,13 +10,24 @@ class PatientAdmin(admin.ModelAdmin):
 
 @admin.register(PatientResponse)
 class PatientResponseAdmin(admin.ModelAdmin):
-    list_display = ('get_pesel', 'score', 'context', 'timestamp', 'is_synced_with_his')
-    list_filter = ('is_synced_with_his',)
+    list_display = (
+        'get_pesel',
+        'survey_id',        # zamiast 'survey'
+        'question_id',      # zamiast 'question'
+        'response_type',
+        'scale_value',
+        'evaluated_score',
+        'is_processed',
+        'created_at',
+    )
+    list_filter = ('response_type', 'is_processed')
     search_fields = ('patient__pesel',)
 
     def get_pesel(self, obj):
         return obj.patient.pesel
+
     get_pesel.short_description = 'PESEL'
+
 
 
 @admin.register(Question)

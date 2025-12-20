@@ -14,12 +14,12 @@
   <p class="center">Służy do cyfrowego zbierania ocen metodą drabiny Cantrila.</p>
 
   <div style="text-align:center; margin-top:2rem;">
-    <a class="btn" href="{% url 'ankieta_start' %}">Rozpocznij ankietę</a>
+  <a class="btn" href="{% url 'ankieta_choice' %}">Rozpocznij ankietę</a>
 
     <br><br>
 
-    <a class="btn" href="{% url 'manage_questions' %}" style="background-color: #6c757d; border-color: #6c757d;">
-        ⚙️ Panel Lekarza (Generator)
-    </a>
+        <a class="btn" href="{% url 'panel_home' %}" style="background-color: #6c757d; border-color: #6c757d;">
+          Panel Lekarza 
+        </a>
   </div>
 {% endblock %}

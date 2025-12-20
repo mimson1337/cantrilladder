@@ -2,20 +2,43 @@
 {% block title %}Wyniki ankiet{% endblock %}
 
 {% block content %}
-  <h1 class="center">Wyniki ankiet</h1>
-  {% for p in patients %}
-    <div class="card" style="margin-top:0.75rem;">
-      <strong>{{ p.pesel }}</strong> {% if p.first_name or p.last_name %}- {{ p.first_name }} {{ p.last_name }}{% endif %}
-      <div style="font-size:0.9rem; color:#666;">Utworzony: {{ p.created_at }}</div>
-      <ul style="margin-top:0.5rem;">
-        {% for r in p.responses.all %}
-          <li>{{ r.timestamp }} — <strong>{{ r.score }}</strong> — {{ r.context }}</li>
+  <h2 class="center">Wyniki ankiet</h2>
+  <form method="get" style="max-width:720px; margin:0.5rem auto; display:flex; gap:8px;">
+    <input name="pesel" value="{{ pesel }}" placeholder="PESEL" style="flex:1; padding:8px;" />
+    <input name="survey_id" value="{{ survey_id }}" placeholder="Survey ID" style="flex:1; padding:8px;" />
+    <button class="btn" type="submit">Filtruj</button>
+  </form>
+
+  <div style="max-width:1000px; margin:1rem auto;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="text-align:left; border-bottom:1px solid #e5e7eb;">
+          <th>PESEL</th>
+          <th>Survey</th>
+          <th>Question ID</th>
+          <th>Type</th>
+          <th>Value / Text</th>
+          <th>Evaluated</th>
+          <th>Audio</th>
+          <th>When</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr style="border-bottom:1px solid #f3f4f6;">
+            <td>{{ r.patient_pesel }}</td>
+            <td>{{ r.survey_id }}</td>
+            <td>{{ r.question_id }}</td>
+            <td>{{ r.response_type }}</td>
+            <td>{% if r.response_type == 'scale' %}{{ r.scale_value }}{% else %}{{ r.text_answer }}{% endif %}</td>
+            <td>{{ r.evaluated_score }}</td>
+            <td>{% if r.audio_file %}<a href="{{ r.audio_file }}">Plik</a>{% endif %}</td>
+            <td>{{ r.created_at }}</td>
+          </tr>
         {% empty %}
-          <li style="color:#666;">Brak zapisanych odpowiedzi</li>
+          <tr><td colspan="8" style="text-align:center; padding:10px;">Brak danych</td></tr>
         {% endfor %}
-      </ul>
-    </div>
-  {% empty %}
-    <p>Brak pacjentów w systemie.</p>
-  {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endblock %}

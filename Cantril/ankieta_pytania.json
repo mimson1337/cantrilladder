@@ -1,8 +1,25 @@
 {
     "title": "Czy lubimy jeść dużo jedzenia?",
     "questions": [
-        "Czy lubisz jeść placki?",
-        "Czy lubisz jeść gulasz?",
-        "Czy lubisz jeść ryż?"
+        {
+            "id": "q1",
+            "text": "Czy lubisz jeść placki?"
+        },
+        {
+            "id": "q2",
+            "text": "Czy lubisz jeść gulasz?"
+        },
+        {
+            "id": "q3",
+            "text": "Czy lubisz jeść ryż?"
+        },
+        {
+            "id": "q4",
+            "text": "Lubisz?"
+        },
+        {
+            "id": "q5",
+            "text": "Siema?"
+        }
     ]
 }
