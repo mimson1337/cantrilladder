@@ -4,6 +4,7 @@ import requests
 import uuid
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -321,32 +322,12 @@ def ankieta_voice_question(request, question_number):
 
                 files = {'audio': (os.path.basename(saved_name), f, mime)}
 
-                # body part as required by your n8n flow
-                body = {
+                # Simple payload for n8n
+                data = {
                     'question': question_text,
                     'patientID': str(patient.id),
                     'surveyID': survey_id,
                     'questionID': question_id
-                }
-
-                # envelope similar to your Postman example (n8n can decide what to use)
-                envelope = [
-                    {
-                        'headers': {
-                            'content-type': 'multipart/form-data',
-                            'user-agent': 'CantrilApp/1.0',
-                        },
-                        'params': {},
-                        'query': {},
-                        'body': body,
-                        'webhookUrl': N8N_WEBHOOK_URL,
-                        'executionMode': 'test'
-                    }
-                ]
-
-                data = {
-                    'body': json.dumps(body, ensure_ascii=False),
-                    'envelope': json.dumps(envelope, ensure_ascii=False)
                 }
 
                 # send to n8n (non-blocking: errors are caught)
@@ -413,67 +394,53 @@ def panel_results(request):
 def n8n_results_webhook(request):
     """Endpoint to receive processed results from n8n.
 
-    Expected JSON payload: list of objects with keys like 'question ID', 'pesel', 'survey ID', 'score'
-    We'll map these to existing PatientResponse records by patient.pesel and question_id / survey_id
+    Expected: form-data or JSON with keys like 'questionID', 'patientID', 'surveyID', 'score'
     """
     if request.method != 'POST':
-        return render(request, 'webhook_info.html', {'message': 'POST JSON expected'})
+        return JsonResponse({'status': 'error', 'message': 'POST expected'})
 
+    # Try to parse as JSON first, then fall back to form data
+    payload = None
     try:
         payload = json.loads(request.body.decode('utf-8'))
     except Exception:
-        return render(request, 'webhook_info.html', {'message': 'Invalid JSON'})
+        # Try form data
+        payload = request.POST.dict()
+        if not payload:
+            return JsonResponse({'status': 'error', 'message': 'No data received'})
+
+    # Ensure payload is a list
+    if isinstance(payload, dict):
+        payload = [payload]
+
+    print(f"🔍 DEBUG n8n webhook: {json.dumps(payload, indent=2)}")
 
     updated = 0
     created = 0
     for item in payload:
-        # accept various key formats
+        # Get required fields
         qid = item.get('question ID') or item.get('questionID') or item.get('question_id') or item.get('questionId')
-        pesel = item.get('pesel') or item.get('patientID') or item.get('patientId')
         survey = item.get('survey ID') or item.get('surveyID') or item.get('survey_id')
         score = item.get('score') or item.get('evaluated_score') or item.get('rating')
 
-        if not qid or not pesel:
+        if not qid or not survey:
+            print(f"⚠️ Missing qid or survey: qid={qid}, survey={survey}")
             continue
 
-        # normalize pesel to string
-        pesel_str = str(pesel)
+        print(f"📝 Processing: qid={qid}, survey={survey}, score={score}")
 
-        # find patient
+        # Find PatientResponse directly by surveyID and questionID
         try:
-            patient = Patient.objects.get(pesel=pesel_str)
-        except Patient.DoesNotExist:
-            patient = None
-
-        # find matching PatientResponse
-        pr = None
-        if patient:
-            pr_qs = PatientResponse.objects.filter(patient=patient, question_id=str(qid))
-            if survey:
-                pr_qs = pr_qs.filter(survey_id=str(survey))
-            pr = pr_qs.order_by('-created_at').first()
-
-        if pr:
+            pr = PatientResponse.objects.get(question_id=str(qid), survey_id=str(survey))
             pr.evaluated_score = float(score) if score is not None else None
             pr.is_processed = True
             pr.save()
             updated += 1
-        else:
-            # create a new PatientResponse record if we have patient
-            if patient:
-                PatientResponse.objects.create(
-                    patient=patient,
-                    survey_id=str(survey) if survey else 'unknown',
-                    question_id=str(qid),
-                    response_type='scale',
-                    scale_value=None,
-                    text_answer='',
-                    evaluated_score=float(score) if score is not None else None,
-                    is_processed=True,
-                )
-                created += 1
+            print(f"✏️ Updated PatientResponse {pr.id}")
+        except PatientResponse.DoesNotExist:
+            print(f"❌ PatientResponse not found for survey={survey}, qid={qid}")
 
-    return render(request, 'webhook_info.html', {'message': f'Processed: updated={updated}, created={created}'})
+    return JsonResponse({'status': 'ok', 'updated': updated, 'created': created})
 
 # =====================
 # Stary formularz pacjenta (opcjonalny)
