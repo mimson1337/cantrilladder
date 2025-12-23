@@ -8,16 +8,29 @@
 <form method="post" enctype="multipart/form-data" id="voice_form" style="margin: 1.25rem auto; max-width:720px; padding:16px; border-radius:8px; background:#fbfbff; box-shadow:0 6px 18px rgba(18,38,72,0.06);">
   {% csrf_token %}
 
-  <label style="font-weight:700;">Typ odpowiedzi:</label>
-  <div style="margin-bottom:1rem;">
-    <label><input type="radio" name="response_type" value="audio" checked> Głosowo (nagranie)</label>
-    <label style="margin-left:1rem;"><input type="radio" name="response_type" value="text"> Tekstowa</label>
+  <div style="font-weight:800; margin-bottom:6px;">Wybierz typ odpowiedzi</div>
+  <div class="mode-picker" style="margin-top:0; margin-bottom:12px;">
+    <div class="mode-option">
+      <input class="mode-radio" type="radio" name="response_type" id="response_audio" value="audio" checked>
+      <label class="mode-body" for="response_audio">
+        <span class="mode-title">Głosowo (nagranie)</span>
+        <span class="mode-desc">Nagraj odpowiedź mikrofonem. Po nagraniu kliknij „Następne”.</span>
+      </label>
+    </div>
+
+    <div class="mode-option">
+      <input class="mode-radio" type="radio" name="response_type" id="response_text" value="text">
+      <label class="mode-body" for="response_text">
+        <span class="mode-title">Tekstowa</span>
+        <span class="mode-desc">Wpisz odpowiedź w polu tekstowym. Następnie kliknij „Następne”.</span>
+      </label>
+    </div>
   </div>
 
   <div id="audio_div" style="display:flex; flex-direction:column; gap:8px;">
     <p style="margin:0;">Użyj przycisku <strong>Start</strong>/<strong>Stop</strong>, aby nagrać odpowiedź. Kliknij "Następne" aby przejść dalej.</p>
     <div style="display:flex; gap:8px; align-items:center;">
-      <button type="button" id="record_btn" style="padding:10px 14px; border-radius:8px; background:#2563eb; color:#fff; border:none; cursor:pointer;">Start</button>
+      <button type="button" id="record_btn" class="btn">Start</button>
       <div id="record_status" style="font-weight:600; color:#374151;">Nie nagrywasz</div>
     </div>
     <audio id="audio_preview" controls style="display:none; margin-top:0.5rem;"></audio>
@@ -45,12 +58,15 @@
   const textDiv = document.getElementById('text_div');
   const radios = document.querySelectorAll("input[name='response_type']");
 
-  radios.forEach(r => {
-    r.addEventListener('change', () => {
-      audioDiv.style.display = r.value==='audio' ? 'block' : 'none';
-      textDiv.style.display = r.value==='text' ? 'block' : 'none';
-    });
-  });
+  function syncResponseUI() {
+    const selected = document.querySelector("input[name='response_type']:checked");
+    const value = selected ? selected.value : 'audio';
+    audioDiv.style.display = value === 'audio' ? 'flex' : 'none';
+    textDiv.style.display = value === 'text' ? 'block' : 'none';
+  }
+
+  radios.forEach(r => r.addEventListener('change', syncResponseUI));
+  syncResponseUI();
 
   // --- Audio recording auto-start on load ---
   let mediaRecorder, audioChunks = [];

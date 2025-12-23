@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Historia ankiet{% endblock %}
+
+{% block content %}
+  <h2 class="center">Historia wypełnionych ankiet</h2>
+
+  <form method="get" style="max-width:720px; margin:0.5rem auto; display:flex; gap:8px;">
+    <input name="q" value="{{ q }}" placeholder="PESEL / imię / nazwisko / survey ID" style="flex:1; padding:8px;" />
+    <button class="btn" type="submit">Szukaj</button>
+  </form>
+
+  <div style="max-width:1000px; margin:1rem auto;">
+    {% for p in patients %}
+      <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; margin-bottom:12px; background:#fff;">
+        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
+          <div style="font-weight:800;">
+            <a href="{% url 'panel_patient_history' p.id %}">{{ p.pesel }}</a>
+            {% if p.first_name or p.last_name %}
+              — {{ p.first_name }} {{ p.last_name }}
+            {% endif %}
+          </div>
+          <div style="color:#666; font-size:0.95rem;">Wypełnienia: {{ p.surveys|length }}</div>
+        </div>
+
+        <div style="margin-top:10px; overflow:auto;">
+          <table style="width:100%; border-collapse:collapse; min-width:760px;">
+            <thead>
+              <tr style="text-align:left; border-bottom:1px solid #e5e7eb;">
+                <th>Survey</th>
+                <th>Liczba odpowiedzi</th>
+                <th>Przetworzone</th>
+                <th>Pierwsza</th>
+                <th>Ostatnia</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in p.surveys %}
+                <tr style="border-bottom:1px solid #f3f4f6;">
+                  <td>{{ s.survey_id }}</td>
+                  <td>{{ s.responses_count }}</td>
+                  <td>{{ s.processed_count }} / {{ s.responses_count }}</td>
+                  <td>{{ s.first_response_at }}</td>
+                  <td>{{ s.last_response_at }}</td>
+                  <td style="text-align:right; white-space:nowrap;">
+                    <a href="{% url 'panel_results' %}?pesel={{ p.pesel }}&survey_id={{ s.survey_id }}">Szczegóły</a>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="6" style="text-align:center; padding:10px;">Brak ankiet</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% empty %}
+      <div style="text-align:center; padding:10px; color:#666;">Brak danych</div>
+    {% endfor %}
+  </div>
+{% endblock %}

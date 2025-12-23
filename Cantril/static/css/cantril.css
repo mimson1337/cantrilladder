@@ -18,8 +18,35 @@ main{padding:1.25rem; max-width:980px; margin:1rem auto}
 .btn{display:inline-block; padding:0.7rem 1rem; border-radius:8px; background:var(--primary); color:white; border:none; cursor:pointer; font-weight:700}
 .btn:active{transform:translateY(1px)}
 input,select,textarea{font-size:1rem; padding:0.6rem; border:1px solid #d7dbe9; border-radius:6px; width:100%; box-sizing:border-box}
+input[type="radio"],
+input[type="checkbox"]{
+  width:auto;
+  padding:0;
+  border:none;
+  border-radius:0;
+}
 label{font-weight:700; display:block; margin-bottom:0.4rem}
 .center{text-align:center}
+
+/* PESEL 11-box input */
+.pesel-boxes{display:flex; gap:8px; margin-top:0.35rem; align-items:center; justify-content:center;}
+.pesel-box{width:36px; height:44px; padding:0; text-align:center; font-size:1.1rem; font-weight:700; border:1px solid #d7dbe9; border-radius:8px; box-sizing:border-box; background:#fff;}
+.pesel-box:focus-visible{outline:2px solid rgba(11,94,215,0.35); outline-offset:2px;}
+
+@media (max-width:520px){
+  .pesel-boxes{gap:6px;}
+  .pesel-box{width:30px; height:42px;}
+}
+
+/* Survey start: mode picker */
+.mode-picker{margin-top:1rem; display:grid; gap:10px;}
+.mode-option{position:relative;}
+.mode-radio{position:absolute; top:14px; right:14px; margin:0; padding:0; border:none; width:auto; accent-color:var(--primary); z-index:2;}
+.mode-body{display:block; margin:0; cursor:pointer; padding:14px 44px 14px 14px; border:1px solid #d7dbe9; border-radius:10px; background:#fff; font-weight:400;}
+.mode-title{display:block; font-weight:800; margin:0 0 4px; color:var(--text)}
+.mode-desc{display:block; margin:0; color:#555; font-size:0.95rem; line-height:1.25; font-weight:400;}
+.mode-radio:checked + .mode-body{border-color:var(--primary); background:var(--muted); box-shadow:0 6px 18px rgba(11,94,215,0.06)}
+.mode-radio:focus-visible + .mode-body{outline:2px solid rgba(11,94,215,0.35); outline-offset:2px;}
 
 /* Ladder specific styles */
 #ladder-visual{background:transparent}

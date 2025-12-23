@@ -7,16 +7,162 @@
 
   <form method="post" style="max-width:520px; margin: 1rem auto;">
     {% csrf_token %}
-    {{ form.pesel.label_tag }}<br>
-    {{ form.pesel }}
+    <label for="pesel_0">PESEL:</label>
 
-    <div style="margin-top:1rem;">
-      <label><input type="radio" name="mode" value="cantril" checked> Cantril (skala 1-10)</label><br>
-      <label><input type="radio" name="mode" value="voice"> Głosowo / Tekstowo (nagranie lub wpis)</label>
+    {# Real field submitted to Django (filled by JS) #}
+    <input type="hidden" name="pesel" id="id_pesel" value="{{ form.pesel.value|default:'' }}">
+
+    <div class="pesel-boxes" role="group" aria-label="PESEL (11 cyfr)">
+      <input class="pesel-box" id="pesel_0"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 1">
+      <input class="pesel-box" id="pesel_1"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 2">
+      <input class="pesel-box" id="pesel_2"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 3">
+      <input class="pesel-box" id="pesel_3"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 4">
+      <input class="pesel-box" id="pesel_4"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 5">
+      <input class="pesel-box" id="pesel_5"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 6">
+      <input class="pesel-box" id="pesel_6"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 7">
+      <input class="pesel-box" id="pesel_7"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 8">
+      <input class="pesel-box" id="pesel_8"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 9">
+      <input class="pesel-box" id="pesel_9"  type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 10">
+      <input class="pesel-box" id="pesel_10" type="text" inputmode="numeric" pattern="\d" maxlength="1" autocomplete="off" aria-label="Cyfra 11">
+    </div>
+
+    <div id="pesel_client_error" style="color:red; margin-top:0.4rem; display:none;"></div>
+
+    <noscript>
+      <div style="margin-top:0.6rem;">
+        {{ form.pesel }}
+      </div>
+    </noscript>
+    {% if form.pesel.errors %}
+      <div style="color:red; margin-top:0.4rem;">
+        {{ form.pesel.errors }}
+      </div>
+    {% endif %}
+    {% if form.non_field_errors %}
+      <div style="color:red; margin-top:0.4rem;">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="mode-picker" aria-label="Wybór trybu ankiety">
+      <div class="mode-option">
+        <input class="mode-radio" type="radio" name="mode" id="mode_cantril" value="cantril" checked>
+        <label class="mode-body" for="mode_cantril">
+          <span class="mode-title">Cantril (skala 1–10)</span>
+          <span class="mode-desc">Odpowiadasz wybierając poziom na skali dla każdego pytania.</span>
+        </label>
+      </div>
+
+      <div class="mode-option">
+        <input class="mode-radio" type="radio" name="mode" id="mode_voice" value="voice">
+        <label class="mode-body" for="mode_voice">
+          <span class="mode-title">Głosowo / Tekstowo</span>
+          <span class="mode-desc">Dla każdego pytania nagrywasz odpowiedź lub wpisujesz tekst.</span>
+        </label>
+      </div>
     </div>
 
     <div style="text-align:center; margin-top:1rem;">
       <button class="btn" type="submit">Rozpocznij</button>
     </div>
   </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function(){
+    const hidden = document.getElementById('id_pesel');
+    const errorEl = document.getElementById('pesel_client_error');
+    const boxes = Array.from(document.querySelectorAll('.pesel-box'));
+    const form = hidden?.closest('form');
+
+    if (!hidden || boxes.length !== 11 || !form) return;
+
+    function digitsOnly(value){
+      return (value || '').replace(/\D/g, '');
+    }
+
+    function syncHidden(){
+      hidden.value = boxes.map(b => (b.value || '')).join('');
+    }
+
+    function setError(message){
+      if (!errorEl) return;
+      if (!message){
+        errorEl.textContent = '';
+        errorEl.style.display = 'none';
+      } else {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+    }
+
+    function fillFromString(pesel){
+      const d = digitsOnly(pesel).slice(0, 11);
+      boxes.forEach((b, i) => {
+        b.value = d[i] || '';
+      });
+      syncHidden();
+    }
+
+    // Prefill when server re-renders invalid form
+    fillFromString(hidden.value);
+
+    boxes.forEach((box, idx) => {
+      box.addEventListener('input', (e) => {
+        const v = digitsOnly(box.value);
+        box.value = v ? v.slice(-1) : '';
+        syncHidden();
+        setError('');
+        if (box.value && idx < boxes.length - 1) {
+          boxes[idx + 1].focus();
+          boxes[idx + 1].select();
+        }
+      });
+
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && idx > 0) {
+          boxes[idx - 1].focus();
+          boxes[idx - 1].select();
+        }
+        if (e.key === 'ArrowLeft' && idx > 0) {
+          boxes[idx - 1].focus();
+          boxes[idx - 1].select();
+        }
+        if (e.key === 'ArrowRight' && idx < boxes.length - 1) {
+          boxes[idx + 1].focus();
+          boxes[idx + 1].select();
+        }
+      });
+
+      box.addEventListener('paste', (e) => {
+        const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+        const d = digitsOnly(text);
+        if (!d) return;
+        e.preventDefault();
+        const start = idx;
+        const slice = d.slice(0, 11 - start);
+        slice.split('').forEach((ch, offset) => {
+          boxes[start + offset].value = ch;
+        });
+        syncHidden();
+        setError('');
+        const nextIndex = Math.min(start + slice.length, boxes.length - 1);
+        boxes[nextIndex].focus();
+        boxes[nextIndex].select();
+      });
+    });
+
+    form.addEventListener('submit', (e) => {
+      syncHidden();
+      const v = digitsOnly(hidden.value);
+      if (v.length !== 11) {
+        e.preventDefault();
+        setError('PESEL musi mieć dokładnie 11 cyfr.');
+        const firstEmpty = boxes.find(b => !b.value);
+        (firstEmpty || boxes[0]).focus();
+      }
+    });
+  })();
+</script>
 {% endblock %}

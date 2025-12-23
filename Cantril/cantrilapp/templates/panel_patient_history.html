@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Historia pacjenta{% endblock %}
+
+{% block content %}
+  <h2 class="center">Historia pacjenta</h2>
+
+  <div style="max-width:1000px; margin:0.5rem auto 0;">
+    <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
+      <div style="font-weight:800;">
+        {{ patient.pesel }}
+        {% if patient.first_name or patient.last_name %}
+          — {{ patient.first_name }} {{ patient.last_name }}
+        {% endif %}
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+        <a href="{% url 'panel_history' %}">← Wróć do historii</a>
+        <a href="{% url 'panel_results' %}?pesel={{ patient.pesel }}">Wszystkie odpowiedzi</a>
+        <a href="{% url 'admin:cantrilapp_patient_change' patient.id %}">Edytuj w adminie</a>
+      </div>
+    </div>
+
+    <div style="margin-top:6px; color:#666; font-size:0.95rem;">
+      {% if patient.date_of_birth %}Data urodzenia: {{ patient.date_of_birth }}{% endif %}
+      {% if patient.created_at %}
+        {% if patient.date_of_birth %} · {% endif %}
+        Utworzono: {{ patient.created_at }}
+      {% endif %}
+    </div>
+
+    <form method="get" style="max-width:720px; margin:0.75rem 0; display:flex; gap:8px;">
+      <input name="survey" value="{{ survey }}" placeholder="Filtr: survey ID (np. UUID)" style="flex:1; padding:8px;" />
+      <button class="btn" type="submit">Filtruj</button>
+    </form>
+
+    <div style="margin-top:10px; overflow:auto;">
+      <table style="width:100%; border-collapse:collapse; min-width:760px;">
+        <thead>
+          <tr style="text-align:left; border-bottom:1px solid #e5e7eb;">
+            <th>Survey</th>
+            <th>Liczba odpowiedzi</th>
+            <th>Przetworzone</th>
+            <th>Pierwsza</th>
+            <th>Ostatnia</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in surveys %}
+            <tr style="border-bottom:1px solid #f3f4f6;">
+              <td>{{ s.survey_id }}</td>
+              <td>{{ s.responses_count }}</td>
+              <td>{{ s.processed_count }} / {{ s.responses_count }}</td>
+              <td>{{ s.first_response_at }}</td>
+              <td>{{ s.last_response_at }}</td>
+              <td style="text-align:right; white-space:nowrap;">
+                <a href="{% url 'panel_results' %}?pesel={{ patient.pesel }}&survey_id={{ s.survey_id }}">Szczegóły</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" style="text-align:center; padding:10px;">Brak danych</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

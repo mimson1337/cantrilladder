@@ -2,7 +2,8 @@ import json
 import os
 import requests
 import uuid
-from django.shortcuts import render, redirect
+from django.db.models import Count, Max, Min, Q
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django import forms
@@ -37,7 +38,28 @@ def get_questions_from_json():
 # Formularz PESEL
 # =====================
 class PeselForm(forms.Form):
-    pesel = forms.CharField(max_length=11, label='PESEL')
+    pesel = forms.CharField(
+        label='PESEL',
+        min_length=11,
+        max_length=11,
+        widget=forms.TextInput(
+            attrs={
+                'inputmode': 'numeric',
+                'pattern': r'\d{11}',
+                'maxlength': '11',
+                'minlength': '11',
+                'autocomplete': 'off',
+            }
+        ),
+    )
+
+    def clean_pesel(self):
+        pesel = (self.cleaned_data.get('pesel') or '').strip()
+        if len(pesel) != 11:
+            raise forms.ValidationError('PESEL musi mieć dokładnie 11 cyfr.')
+        if not pesel.isdigit():
+            raise forms.ValidationError('PESEL musi składać się wyłącznie z cyfr.')
+        return pesel
 
 # =====================
 # Generator ankiety dla lekarza
@@ -388,6 +410,98 @@ def panel_results(request):
         })
 
     return render(request, 'panel_results.html', {'rows': rows, 'pesel': pesel, 'survey_id': survey_id})
+
+
+def panel_history(request):
+    """History of filled surveys grouped by patient and survey_id.
+
+    Search supports: pesel, first/last name, survey_id.
+    """
+    q = request.GET.get('q', '').strip()
+
+    base_qs = PatientResponse.objects.select_related('patient')
+    if q:
+        base_qs = base_qs.filter(
+            Q(patient__pesel__icontains=q)
+            | Q(patient__first_name__icontains=q)
+            | Q(patient__last_name__icontains=q)
+            | Q(survey_id__icontains=q)
+        )
+
+    aggregated = (
+        base_qs.values(
+            'patient_id',
+            'patient__pesel',
+            'patient__first_name',
+            'patient__last_name',
+            'survey_id',
+        )
+        .annotate(
+            responses_count=Count('id'),
+            processed_count=Count('id', filter=Q(is_processed=True)),
+            first_response_at=Min('created_at'),
+            last_response_at=Max('created_at'),
+        )
+        .order_by('patient__pesel', '-last_response_at')
+    )
+
+    patients_map = {}
+    for row in aggregated:
+        pid = row['patient_id']
+        if pid not in patients_map:
+            patients_map[pid] = {
+                'id': pid,
+                'pesel': row['patient__pesel'],
+                'first_name': row['patient__first_name'],
+                'last_name': row['patient__last_name'],
+                'surveys': [],
+            }
+
+        patients_map[pid]['surveys'].append(
+            {
+                'survey_id': row['survey_id'],
+                'responses_count': row['responses_count'],
+                'processed_count': row['processed_count'],
+                'first_response_at': row['first_response_at'],
+                'last_response_at': row['last_response_at'],
+            }
+        )
+
+    patients = list(patients_map.values())
+    patients.sort(key=lambda p: (p['pesel'] or ''))
+
+    return render(request, 'panel_history.html', {'patients': patients, 'q': q})
+
+
+def panel_patient_history(request, patient_id: int):
+    """Patient card: list survey runs (survey_id) for a single patient."""
+    patient = get_object_or_404(Patient, id=patient_id)
+    survey_q = request.GET.get('survey', '').strip()
+
+    base_qs = PatientResponse.objects.filter(patient=patient)
+    if survey_q:
+        base_qs = base_qs.filter(survey_id__icontains=survey_q)
+
+    surveys = (
+        base_qs.values('survey_id')
+        .annotate(
+            responses_count=Count('id'),
+            processed_count=Count('id', filter=Q(is_processed=True)),
+            first_response_at=Min('created_at'),
+            last_response_at=Max('created_at'),
+        )
+        .order_by('-last_response_at')
+    )
+
+    return render(
+        request,
+        'panel_patient_history.html',
+        {
+            'patient': patient,
+            'surveys': list(surveys),
+            'survey': survey_q,
+        },
+    )
 
 
 @csrf_exempt

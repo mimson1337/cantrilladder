@@ -20,6 +20,8 @@ urlpatterns = [
     # Panel lekarza
     path('panel/', views.panel_home, name='panel_home'),
     path('panel/results/', views.panel_results, name='panel_results'),
+    path('panel/history/', views.panel_history, name='panel_history'),
+    path('panel/patient/<int:patient_id>/history/', views.panel_patient_history, name='panel_patient_history'),
 
     # Webhook endpoint for n8n results
     path('webhook/n8n/results/', views.n8n_results_webhook, name='n8n_results_webhook'),
