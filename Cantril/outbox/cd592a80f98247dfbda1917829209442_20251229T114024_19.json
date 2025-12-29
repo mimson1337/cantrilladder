@@ -1,0 +1,29 @@
+[
+  {
+    "patientID": "19",
+    "surveyID": "cd592a80f98247dfbda1917829209442_20251229T114024",
+    "questionID": "q1",
+    "question": "Sprawdzam nowe pytania?",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  },
+  {
+    "patientID": "19",
+    "surveyID": "cd592a80f98247dfbda1917829209442_20251229T114024",
+    "questionID": "q2",
+    "question": "Czy to mi zadziałą?",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  },
+  {
+    "patientID": "19",
+    "surveyID": "cd592a80f98247dfbda1917829209442_20251229T114024",
+    "questionID": "q3",
+    "question": "Czy dobrze się czujesz?",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  }
+]

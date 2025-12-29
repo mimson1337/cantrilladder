@@ -1,17 +1,17 @@
 {
-    "title": "SIEMA",
+    "title": "Ankieta 1",
     "questions": [
         {
             "id": "q1",
-            "text": "sda"
+            "text": "Pytanie 1"
         },
         {
             "id": "q2",
-            "text": "ads"
+            "text": "Pytanie 2"
         },
         {
             "id": "q3",
-            "text": "asd"
+            "text": "Pytanie 3"
         }
     ]
 }

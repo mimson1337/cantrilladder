@@ -52,6 +52,8 @@ class PatientResponse(models.Model):
     response_type = models.CharField(max_length=10, choices=RESPONSE_TYPE)
     scale_value = models.FloatField(null=True, blank=True)
     text_answer = models.TextField(null=True, blank=True)
+    # store the question text at the time of response to keep history stable
+    question_text = models.TextField(null=True, blank=True)
     audio_file = models.FileField(upload_to='audio_answers/', null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

@@ -1,0 +1,47 @@
+[
+  {
+    "patientID": "16",
+    "surveyID": "1e87b057-9c76-4e90-a6dd-c244e5a26af1",
+    "questionID": "q1",
+    "question": "Czy lubisz jeść placki?",
+    "responseType": "scale",
+    "scaleValue": 5,
+    "textAnswer": null
+  },
+  {
+    "patientID": "16",
+    "surveyID": "1e87b057-9c76-4e90-a6dd-c244e5a26af1",
+    "questionID": "q2",
+    "question": "Czy lubisz jeść gulasz?",
+    "responseType": "scale",
+    "scaleValue": 8,
+    "textAnswer": null
+  },
+  {
+    "patientID": "16",
+    "surveyID": "1e87b057-9c76-4e90-a6dd-c244e5a26af1",
+    "questionID": "q3",
+    "question": "Czy lubisz jeść ryż?",
+    "responseType": "scale",
+    "scaleValue": 4,
+    "textAnswer": null
+  },
+  {
+    "patientID": "16",
+    "surveyID": "1e87b057-9c76-4e90-a6dd-c244e5a26af1",
+    "questionID": "q4",
+    "question": "Lubisz?",
+    "responseType": "scale",
+    "scaleValue": 8,
+    "textAnswer": null
+  },
+  {
+    "patientID": "16",
+    "surveyID": "1e87b057-9c76-4e90-a6dd-c244e5a26af1",
+    "questionID": "q5",
+    "question": "Siema?",
+    "responseType": "scale",
+    "scaleValue": 6,
+    "textAnswer": null
+  }
+]

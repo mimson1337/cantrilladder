@@ -1,0 +1,29 @@
+[
+  {
+    "patientID": "22",
+    "surveyID": "4f2c5960fd1d4ab297b0522f7df49e7f_20251229T124611",
+    "questionID": "q1",
+    "question": "najnwosze?",
+    "responseType": "scale",
+    "scaleValue": 3,
+    "textAnswer": null
+  },
+  {
+    "patientID": "22",
+    "surveyID": "4f2c5960fd1d4ab297b0522f7df49e7f_20251229T124611",
+    "questionID": "q2",
+    "question": "nowe pytanko",
+    "responseType": "scale",
+    "scaleValue": 6,
+    "textAnswer": null
+  },
+  {
+    "patientID": "22",
+    "surveyID": "4f2c5960fd1d4ab297b0522f7df49e7f_20251229T124611",
+    "questionID": "q3",
+    "question": "NOWE BLAGAM DZIALAJ",
+    "responseType": "scale",
+    "scaleValue": 3,
+    "textAnswer": null
+  }
+]

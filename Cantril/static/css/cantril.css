@@ -60,3 +60,22 @@ label{font-weight:700; display:block; margin-bottom:0.4rem}
   #ladder-visual{width:120px; height:360px}
   .ladder-step{width:96px}
 }
+
+/* Table styles for admin panels */
+.wide{max-width:1200px}
+.app-table{width:100%; border-collapse:separate; border-spacing:0; table-layout:auto}
+.app-table thead th{background:#fafbfd; padding:10px 12px; text-align:left; font-weight:800; border-bottom:1px solid #e6e9f2}
+.app-table tbody td{padding:10px 12px; vertical-align:top; border-bottom:1px solid #f3f4f6; border-right:1px solid #f7f8fb}
+.app-table tbody td:last-child{border-right:0}
+.app-table th:last-child, .app-table td:last-child{white-space:nowrap}
+.app-table td{overflow:visible}
+.app-table td a{color:var(--primary); font-weight:700}
+
+/* ensure forms and containers have breathing room */
+.card .app-table, .wide .app-table{background:#fff; border-radius:8px;}
+
+/* nowrap helper for timestamps */
+.app-table td.nowrap{white-space:nowrap; overflow:visible}
+
+/* primary button already defined as .btn; ensure consistent clickable cursor */
+.btn[onclick], .btn-secondary[onclick]{cursor:pointer}

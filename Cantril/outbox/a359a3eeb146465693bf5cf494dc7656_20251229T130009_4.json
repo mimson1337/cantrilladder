@@ -1,0 +1,29 @@
+[
+  {
+    "patientID": "4",
+    "surveyID": "a359a3eeb146465693bf5cf494dc7656_20251229T130009",
+    "questionID": "q1",
+    "question": "SIEM",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  },
+  {
+    "patientID": "4",
+    "surveyID": "a359a3eeb146465693bf5cf494dc7656_20251229T130009",
+    "questionID": "q2",
+    "question": "PEN",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  },
+  {
+    "patientID": "4",
+    "surveyID": "a359a3eeb146465693bf5cf494dc7656_20251229T130009",
+    "questionID": "q3",
+    "question": "IS",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  }
+]

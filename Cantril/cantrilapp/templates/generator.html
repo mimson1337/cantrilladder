@@ -5,7 +5,10 @@
 {% block content %}
 <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
     
-    <h1 class="center">Generator Pytań</h1>
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+        <button type="button" class="btn" onclick="location.href='{% url 'panel_home' %}'">← Panel</button>
+        <h1 class="center" style="margin:0; flex:1;">Generator Pytań</h1>
+    </div>
     <p class="center" style="color: #666; margin-bottom: 30px;">
         Tutaj możesz edytować pytania, które zobaczą pacjenci.
     </p>
@@ -14,9 +17,9 @@
         {% csrf_token %}
         
         <div style="margin-bottom: 25px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tytuł ankiety:</label>
-            <input type="text" name="title" value="{{ data.title|default:'Ankieta Cantrila' }}" 
-                   style="width: 100%; padding: 10px; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                 <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tytuł ankiety:</label>
+                 <input type="text" name="title" required value="{{ data.title|default:'Ankieta Cantrila' }}" 
+                     style="width: 100%; padding: 10px; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
         </div>
         
         <h3 style="border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">Pytania:</h3>

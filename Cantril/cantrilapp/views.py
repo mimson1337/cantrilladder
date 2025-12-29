@@ -2,6 +2,8 @@ import json
 import os
 import requests
 import uuid
+from datetime import datetime
+from django.utils import timezone
 from django.db.models import Count, Max, Min, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -10,7 +12,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.core.files.storage import default_storage
-from .models import Patient, PatientResponse
+from .models import Patient, PatientResponse, Survey
 
 # =====================
 # Konfiguracja pliku JSON i n8n
@@ -33,6 +35,66 @@ def get_questions_from_json():
         except json.JSONDecodeError:
             return default_questions
     return default_questions
+
+
+def format_survey_label(survey_id, fallback_dt=None):
+    """Return human-friendly label for a survey id, e.g. 'Ankieta - 2025-12-29 15:14:51'.
+    If survey_id contains a timestamp suffix like _YYYYmmddTHHMMSS we parse it.
+    Otherwise use fallback_dt (a datetime) when available, else return the raw id.
+    """
+    if not survey_id:
+        return survey_id
+    try:
+        parts = str(survey_id).rsplit('_', 1)
+        if len(parts) == 2:
+            prefix = parts[0]
+            ts = parts[1]
+            # try to resolve prefix as UUID hex and find Survey title
+            try:
+                import uuid as _uuid
+                survey_uuid = _uuid.UUID(hex=prefix)
+                try:
+                    s = Survey.objects.get(id=survey_uuid)
+                    # parse timestamp
+                    if len(ts) == 15 and ts[8] == 'T':
+                        dt = datetime.strptime(ts, '%Y%m%dT%H%M%S')
+                        return f"{s.title} - {dt.strftime('%Y-%m-%d %H:%M:%S')}"
+                except Survey.DoesNotExist:
+                    pass
+            except Exception:
+                # not a uuid hex, fall back
+                pass
+
+            # expect format like 20251229T151451, fallback to previous behavior
+            if len(ts) == 15 and ts[8] == 'T':
+                dt = datetime.strptime(ts, '%Y%m%dT%H%M%S')
+                return f"Ankieta - {dt.strftime('%Y-%m-%d %H:%M:%S')}"
+    except Exception:
+        pass
+
+    if fallback_dt:
+        try:
+            if isinstance(fallback_dt, str):
+                fallback_dt = datetime.fromisoformat(fallback_dt)
+            return f"Ankieta - {fallback_dt.strftime('%Y-%m-%d %H:%M:%S')}"
+        except Exception:
+            pass
+
+    return survey_id
+
+
+def get_question_text_by_id(question_id):
+    """Map a question id (e.g. 'q1') to its text using the current JSON config."""
+    if not question_id:
+        return question_id
+    try:
+        questions = get_questions_from_json()
+        for q in questions:
+            if isinstance(q, dict) and q.get('id') == str(question_id):
+                return q.get('text') or question_id
+    except Exception:
+        pass
+    return question_id
 
 # =====================
 # Formularz PESEL
@@ -66,15 +128,36 @@ class PeselForm(forms.Form):
 # =====================
 def manage_questions(request):
     if request.method == "POST":
+        title = (request.POST.get('title') or '').strip()
+        if not title:
+            messages.error(request, 'Tytuł ankiety jest wymagany.')
+            return redirect('manage_questions')
+
+        # prevent duplicate titles
+        if Survey.objects.filter(title__iexact=title).exists():
+            messages.error(request, 'Ankieta o takiej nazwie już istnieje. Podaj unikalny tytuł.')
+            return redirect('manage_questions')
+
         questions_list = request.POST.getlist('questions')
         clean_questions = [q.strip() for q in questions_list if q.strip()]
 
         questions_with_id = [{"id": f"q{i+1}", "text": q} for i, q in enumerate(clean_questions)]
         data = {
-            "title": request.POST.get('title', 'Ankieta Cantrila'),
+            "title": title,
             "questions": questions_with_id
         }
 
+        # create Survey record (UUID primary key)
+        survey = Survey.objects.create(title=title)
+
+        # write survey-specific JSON for archive
+        surveys_dir = os.path.join(settings.BASE_DIR, 'surveys')
+        os.makedirs(surveys_dir, exist_ok=True)
+        survey_path = os.path.join(surveys_dir, f"{survey.id}.json")
+        with open(survey_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+
+        # also update the active QUESTION_FILE_PATH to this survey (keeps existing patient flow)
         with open(QUESTION_FILE_PATH, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
 
@@ -109,7 +192,10 @@ def ankieta_choice(request):
             pesel = form.cleaned_data['pesel']
             patient, created = Patient.objects.get_or_create(pesel=pesel)
             request.session['patient_id'] = patient.id
-            request.session['survey_run_id'] = str(uuid.uuid4())
+            # create survey id containing a timestamp suffix for better UX when displaying
+            ts = datetime.utcnow().strftime('%Y%m%dT%H%M%S')
+            request.session['survey_run_id'] = f"{uuid.uuid4().hex}_{ts}"
+            request.session['survey_started_at'] = datetime.utcnow().isoformat()
             request.session['survey_mode'] = mode
             # for cantril we keep session answers; for voice we will save per-question
             request.session['answers'] = {}
@@ -155,6 +241,7 @@ def ankieta_cantril_question(request, question_number):
                 response_type=response_type,
                 scale_value=answer_data.get("value") if response_type=="scale" else None,
                 text_answer=answer_data.get("value") if response_type=="text" else "",
+                question_text=q_data.get('text', '') if isinstance(q_data, dict) else (q_data or ''),
                 is_processed=False
             )
 
@@ -299,6 +386,7 @@ def ankieta_voice_question(request, question_number):
                 question_id=question_id,
                 response_type='text',
                 text_answer=text,
+                question_text=question_text,
                 is_processed=False
             )
 
@@ -324,6 +412,7 @@ def ankieta_voice_question(request, question_number):
                 question_id=question_id,
                 response_type='audio',
                 audio_file=saved_name,
+                question_text=question_text,
                 is_processed=False
             )
 
@@ -396,17 +485,51 @@ def panel_results(request):
     # prepare simple rows
     rows = []
     for r in qs:
+        # format created_at into local timezone defined in settings (e.g. Europe/Warsaw)
+        created_cet = None
+        try:
+            if r.created_at is not None:
+                local_dt = timezone.localtime(r.created_at)
+                created_cet = local_dt.strftime('%Y-%m-%d %H:%M:%S')
+                # shorter label (no seconds) for compact display
+                created_label = local_dt.strftime('%Y-%m-%d %H:%M')
+            else:
+                created_label = ''
+        except Exception:
+            created_cet = str(r.created_at)
+            created_label = created_cet
+
+        # map response type to Polish label
+        type_map = {
+            'scale': 'Skala',
+            'text': 'Tekst',
+            'audio': 'Audio'
+        }
+
+        eval_label = 'Brak' if r.evaluated_score is None else str(r.evaluated_score)
+
+        # prefer stored question_text if available (preserves historical wording)
+        qtext = getattr(r, 'question_text', None) or None
+        if not qtext:
+            qtext = get_question_text_by_id(r.question_id)
+
         rows.append({
             'patient_pesel': r.patient.pesel,
             'survey_id': r.survey_id,
+            'survey_label': format_survey_label(r.survey_id, r.created_at),
             'question_id': r.question_id,
+            'question_text': qtext,
             'response_type': r.response_type,
+            'response_type_label': type_map.get(r.response_type, r.response_type),
             'scale_value': r.scale_value,
             'text_answer': r.text_answer,
             'audio_file': r.audio_file.url if r.audio_file else None,
             'evaluated_score': r.evaluated_score,
+            'evaluated_label': eval_label,
             'is_processed': r.is_processed,
             'created_at': r.created_at,
+            'created_cet': created_cet,
+            'created_label': created_label,
         })
 
     return render(request, 'panel_results.html', {'rows': rows, 'pesel': pesel, 'survey_id': survey_id})
@@ -457,18 +580,42 @@ def panel_history(request):
                 'surveys': [],
             }
 
+        # compute a human-friendly label for the survey (use first_response_at as fallback)
+        fallback_dt = row.get('first_response_at') or row.get('last_response_at')
+        # format first/last response to local time strings
+        try:
+            first_local = timezone.localtime(row['first_response_at']).strftime('%Y-%m-%d %H:%M:%S') if row.get('first_response_at') else None
+        except Exception:
+            first_local = row.get('first_response_at')
+        try:
+            last_local = timezone.localtime(row['last_response_at']).strftime('%Y-%m-%d %H:%M:%S') if row.get('last_response_at') else None
+        except Exception:
+            last_local = row.get('last_response_at')
+
         patients_map[pid]['surveys'].append(
             {
                 'survey_id': row['survey_id'],
+                'survey_label': format_survey_label(row['survey_id'], fallback_dt),
                 'responses_count': row['responses_count'],
                 'processed_count': row['processed_count'],
-                'first_response_at': row['first_response_at'],
-                'last_response_at': row['last_response_at'],
+                'first_response_at': first_local,
+                'last_response_at': last_local,
             }
         )
 
     patients = list(patients_map.values())
     patients.sort(key=lambda p: (p['pesel'] or ''))
+
+    # If a query was provided, further filter surveys by the human-friendly survey_label
+    if q:
+        ql = q.lower()
+        filtered = []
+        for p in patients:
+            orig = p['surveys']
+            p['surveys'] = [s for s in orig if ql in (s.get('survey_label') or '').lower() or ql in (s.get('survey_id') or '').lower()]
+            if p['surveys']:
+                filtered.append(p)
+        patients = filtered
 
     return render(request, 'panel_history.html', {'patients': patients, 'q': q})
 
@@ -493,12 +640,34 @@ def panel_patient_history(request, patient_id: int):
         .order_by('-last_response_at')
     )
 
+    surveys_list = []
+    for s in list(surveys):
+        fallback = s.get('first_response_at') or s.get('last_response_at')
+        # format times to local timezone
+        try:
+            first_local = timezone.localtime(s['first_response_at']).strftime('%Y-%m-%d %H:%M:%S') if s.get('first_response_at') else None
+        except Exception:
+            first_local = s.get('first_response_at')
+        try:
+            last_local = timezone.localtime(s['last_response_at']).strftime('%Y-%m-%d %H:%M:%S') if s.get('last_response_at') else None
+        except Exception:
+            last_local = s.get('last_response_at')
+
+        surveys_list.append({
+            'survey_id': s['survey_id'],
+            'survey_label': format_survey_label(s['survey_id'], fallback),
+            'responses_count': s['responses_count'],
+            'processed_count': s['processed_count'],
+            'first_response_at': first_local,
+            'last_response_at': last_local,
+        })
+
     return render(
         request,
         'panel_patient_history.html',
         {
             'patient': patient,
-            'surveys': list(surveys),
+            'surveys': surveys_list,
             'survey': survey_q,
         },
     )

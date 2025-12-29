@@ -3,7 +3,8 @@
 
 {% block content %}
   <h2 class="center">Panel lekarza</h2>
-  <div style="text-align:center; margin-top:1.5rem; display:flex; gap:12px; justify-content:center;">
+  <div style="text-align:center; margin-top:1.5rem; display:flex; gap:12px; justify-content:center; align-items:center;">
+    <button type="button" class="btn" onclick="location.href='{% url 'home' %}'">← Strona główna</button>
     <a class="btn" href="{% url 'manage_questions' %}">Generator ankiety</a>
     <a class="btn" href="{% url 'panel_results' %}" style="background:#2563eb; border-color:#2563eb;">Sprawdź odpowiedzi</a>
     <a class="btn" href="{% url 'panel_history' %}">Historia ankiet</a>

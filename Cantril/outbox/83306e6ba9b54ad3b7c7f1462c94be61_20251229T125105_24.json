@@ -1,0 +1,29 @@
+[
+  {
+    "patientID": "24",
+    "surveyID": "83306e6ba9b54ad3b7c7f1462c94be61_20251229T125105",
+    "questionID": "q1",
+    "question": "nowepyt1",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  },
+  {
+    "patientID": "24",
+    "surveyID": "83306e6ba9b54ad3b7c7f1462c94be61_20251229T125105",
+    "questionID": "q2",
+    "question": "nowepyt2",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  },
+  {
+    "patientID": "24",
+    "surveyID": "83306e6ba9b54ad3b7c7f1462c94be61_20251229T125105",
+    "questionID": "q3",
+    "question": "nowepyt3",
+    "responseType": "scale",
+    "scaleValue": 1,
+    "textAnswer": null
+  }
+]
