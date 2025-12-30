@@ -2,9 +2,13 @@
 {% block title %}Dziękujemy{% endblock %}
 
 {% block content %}
-  <h2 class="center">Dziękujemy za wypełnienie ankiety</h2>
-  <p>Twoje odpowiedzi zostały zapisane.</p>
-  <div style="margin-top:1rem;">
-    <a class="btn" href="{% url 'home' %}">Powrót do strony głównej</a>
+<div class="survey-container">
+  <div class="survey-question" style="text-align:center;">
+    <h2 style="color:#28a745; font-size:2rem; margin-bottom:1rem;">✓ Dziękujemy!</h2>
+    <p style="font-size:1.1rem; margin-bottom:1rem;">Twoje odpowiedzi zostały zapisane i wysłane do systemu.</p>
+    <div class="survey-controls">
+      <a class="btn" href="{% url 'home' %}">Powrót do strony głównej</a>
+    </div>
   </div>
+</div>
 {% endblock %}

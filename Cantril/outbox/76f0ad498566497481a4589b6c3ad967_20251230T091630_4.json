@@ -1,0 +1,29 @@
+[
+  {
+    "patientID": "4",
+    "surveyID": "76f0ad498566497481a4589b6c3ad967_20251230T091630",
+    "questionID": "q1",
+    "question": "",
+    "responseType": "text",
+    "textAnswer": "Ty no nie wiem",
+    "audioFile": null
+  },
+  {
+    "patientID": "4",
+    "surveyID": "76f0ad498566497481a4589b6c3ad967_20251230T091630",
+    "questionID": "q2",
+    "question": "",
+    "responseType": "text",
+    "textAnswer": "Jo jo",
+    "audioFile": null
+  },
+  {
+    "patientID": "4",
+    "surveyID": "76f0ad498566497481a4589b6c3ad967_20251230T091630",
+    "questionID": "q3",
+    "question": "",
+    "responseType": "text",
+    "textAnswer": "Średnio",
+    "audioFile": null
+  }
+]

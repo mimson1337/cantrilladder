@@ -2,46 +2,59 @@
 {% block title %}Wyniki ankiet{% endblock %}
 
 {% block content %}
-  <h2 class="center">Wyniki ankiet</h2>
-  <form method="get" style="max-width:920px; margin:0.5rem auto; display:flex; gap:8px; align-items:center;">
-    <button type="button" class="btn" onclick="location.href='{% url 'panel_home' %}'">← Panel</button>
+  <div class="back-nav">
+    <a class="back-btn" href="{% url 'panel_home' %}">← Panel</a>
     {% if survey_id %}
-      <button type="button" class="btn" onclick="location.href='{% url 'panel_history' %}?q={{ survey_id }}'">← Wróć do historii</button>
+      <a class="back-btn" href="{% url 'panel_history' %}?q={{ survey_id }}">← Historia</a>
     {% endif %}
-    <input name="pesel" value="{{ pesel }}" placeholder="PESEL" style="flex:1; padding:8px;" />
+  </div>
+
+  <h2 class="center">Wyniki ankiet</h2>
+  <form method="get" style="max-width:920px; margin:0.5rem auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:0 1rem; box-sizing:border-box;">
+    <input name="pesel" value="{{ pesel }}" placeholder="PESEL" style="flex:1 1 auto; padding:8px; min-width:80px; box-sizing:border-box;" />
     <button class="btn" type="submit">Filtruj</button>
   </form>
 
-  <div class="wide" style="max-width:1200px; margin:1rem auto;">
-    <table class="app-table" style="width:100%;">
-      <thead>
-          <tr style="text-align:left; border-bottom:1px solid #e5e7eb;">
-          <th>PESEL</th>
-          <th>Ankieta</th>
-          <th>Pytanie</th>
-          <th>Typ</th>
-          <th>Wartość / Tekst</th>
-          <th>Ocena</th>
-          <th>Audio</th>
-          <th>Kiedy</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in rows %}
-          <tr style="border-bottom:1px solid #f3f4f6;">
-            <td>{{ r.patient_pesel }}</td>
-            <td>{{ r.survey_label }}</td>
-            <td style="max-width:320px;">{{ r.question_text }}</td>
-            <td>{{ r.response_type_label }}</td>
-            <td style="max-width:260px;">{% if r.response_type == 'scale' %}{{ r.scale_value }}{% else %}{{ r.text_answer }}{% endif %}</td>
-            <td>{{ r.evaluated_label }}</td>
-            <td>{% if r.audio_file %}<a href="{{ r.audio_file }}">Plik</a>{% endif %}</td>
-            <td title="{{ r.created_cet }}">{{ r.created_label }}</td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="8" style="text-align:center; padding:10px;">Brak danych</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div style="max-width:1200px; margin:1rem auto; padding:0 0.5rem;" class="response-grid">
+    {% for r in rows %}
+      <div class="response-card">
+        <div class="response-header">
+          <div>
+            <div class="response-question">{{ r.question_text }}</div>
+            <div class="response-text">
+              {% if r.response_type == 'scale' %}
+                {{ r.scale_value }}/10
+              {% elif r.response_type == 'text' %}
+                {{ r.text_answer|default:"(brak odpowiedzi)" }}
+              {% elif r.response_type == 'audio' %}
+                {% if r.evaluated_score %}
+                  {{ r.evaluated_score }}/10
+                {% else %}
+                  🎙️ Oczekiwanie na ocenę
+                {% endif %}
+              {% elif r.response_type == 'voice' %}
+                🎤 Odpowiedź głosowa
+              {% else %}
+                (nieznany typ)
+              {% endif %}
+            </div>
+          </div>
+          <div class="response-meta">
+            <div><strong>PESEL:</strong> {{ r.patient_pesel }}</div>
+            <div><strong>Ankieta:</strong> {{ r.survey_label }}</div>
+            <div><strong>Typ:</strong> {{ r.response_type_label }}</div>
+            <div><strong>Ocena:</strong> {{ r.evaluated_label }}</div>
+            <div><strong>Kiedy:</strong> <span title="{{ r.created_cet }}">{{ r.created_label }}</span></div>
+            {% if r.audio_file %}
+              <div style="margin-top:0.4rem;"><a href="{{ r.audio_file }}" style="color:#0b5ed7; text-decoration:none; font-weight:600;">🔊 Audio</a></div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div style="text-align:center; padding:2rem; color:#666; background:#f9f9f9; border-radius:8px;">
+        Brak danych do wyświetlenia
+      </div>
+    {% endfor %}
   </div>
 {% endblock %}

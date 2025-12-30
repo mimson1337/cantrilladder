@@ -1,0 +1,30 @@
+{
+    "title": "Test",
+    "ladder_design": "minimal",
+    "questions": [
+        {
+            "id": "q1",
+            "text": "sda",
+            "scale_labels": {
+                "min": "xd",
+                "max": "xd"
+            }
+        },
+        {
+            "id": "q2",
+            "text": "ads",
+            "scale_labels": {
+                "min": "",
+                "max": ""
+            }
+        },
+        {
+            "id": "q3",
+            "text": "asd",
+            "scale_labels": {
+                "min": "",
+                "max": ""
+            }
+        }
+    ]
+}

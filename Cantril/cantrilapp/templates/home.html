@@ -13,13 +13,21 @@
   <h1 class="center">Witaj w systemie Cantril</h1>
   <p class="center">Służy do cyfrowego zbierania ocen metodą drabiny Cantrila.</p>
 
-  <div style="text-align:center; margin-top:2rem;">
-  <a class="btn" href="{% url 'ankieta_choice' %}">Rozpocznij ankietę</a>
+  <div class="welcome-grid">
+    <!-- Patient Survey -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-icon">📝</div>
+      <h3>Dla pacjenta</h3>
+      <p>Wypełnij ankietę drabinę Cantrila. Odpowiedz szczerze na wszystkie pytania.</p>
+      <a class="btn" href="{% url 'ankieta_choice' %}">Rozpocznij</a>
+    </div>
 
-    <br><br>
-
-        <a class="btn" href="{% url 'panel_home' %}" style="background-color: #6c757d; border-color: #6c757d;">
-          Panel Lekarza 
-        </a>
+    <!-- Doctor Panel -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-icon">👨‍⚕️</div>
+      <h3>Panel lekarza</h3>
+      <p>Zarządzaj ankietami, sprawdzaj odpowiedzi i historię pacjentów.</p>
+      <a class="btn" href="{% url 'panel_home' %}">Wejdź</a>
+    </div>
   </div>
 {% endblock %}

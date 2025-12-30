@@ -2,39 +2,63 @@
 {% block title %}Pytanie {{ question_number }} / {{ total_questions }}{% endblock %}
 
 {% block content %}
-<h2 class="center">Pytanie {{ question_number }} / {{ total_questions }}</h2>
-<p style="font-size:1.15rem;">{{ question }}</p>
+<div class="survey-container">
+  <div class="survey-question">
+    <div class="survey-progress">Pytanie {{ question_number }} z {{ total_questions }}</div>
+    <h2>{{ question }}</h2>
+    <div style="width:100%; height:6px; background:#f0f0f0; border-radius:3px; margin-bottom:1rem; overflow:hidden;">
+      <div style="width:{{ progress_percent }}%; height:100%; background:#0b5ed7; transition:width 0.3s ease;"></div>
+    </div>
+  </div>
 
-<form method="post" enctype="multipart/form-data" style="margin-top:1rem;">
+  <form method="post" enctype="multipart/form-data" style="margin-top:1rem;">
   {% csrf_token %}
 
   <!-- Scale only (Cantril) -->
   <!-- Scale -->
   <div id="scale_div">
-    <div style="display:flex; justify-content:center;">
-      <div id="ladder-visual" style="position:relative; width:160px; height:420px;">
-        <div style="position:absolute; left:28px; top:8px; bottom:8px; width:8px; background:#d0daf8; border-radius:4px;"></div>
-        <div style="position:absolute; right:28px; top:8px; bottom:8px; width:8px; background:#d0daf8; border-radius:4px;"></div>
-        <div id="ladder" aria-label="Skala Cantril 1 do 10" role="radiogroup" style="position:relative; display:flex; flex-direction:column-reverse; gap:10px; align-items:center; justify-content:space-between; height:100%; padding:12px 0;">
-          {% for i in scale_range %}
-            <button type="button" class="ladder-step" data-value="{{ i }}" aria-checked="false" role="radio" title="{{ i }}" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">{{ i }}</button>
-          {% endfor %}
-
+    <div style="display:flex; justify-content:center; overflow-x:auto;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+        <!-- Top Label -->
+        {% if scale_labels.max %}
+        <div style="background:#fff; border:2px solid #0b5ed7; border-radius:8px; padding:12px 20px; min-width:160px; text-align:center; font-weight:600; color:#0b5ed7; font-size:0.95rem;">
+          📍 {{ scale_labels.max }}
         </div>
+        {% endif %}
+        
+        <div id="ladder-visual" class="ladder-design-{{ ladder_design|default:'classic' }}" style="position:relative; width:160px; height:420px; flex-shrink:0;">
+          <div style="position:absolute; left:28px; top:8px; bottom:8px; width:8px; background:#d0daf8; border-radius:4px;"></div>
+          <div style="position:absolute; right:28px; top:8px; bottom:8px; width:8px; background:#d0daf8; border-radius:4px;"></div>
+          <div id="ladder" aria-label="Skala Cantril 1 do 10" role="radiogroup" style="position:relative; display:flex; flex-direction:column-reverse; gap:10px; align-items:center; justify-content:space-between; height:100%; padding:12px 0;">
+            {% for i in scale_range %}
+              <button type="button" class="ladder-step" data-value="{{ i }}" aria-checked="false" role="radio" title="{{ i }}" style="width:120px; height:28px; border-radius:6px; background:#fff; border:1px solid #d0daf8; cursor:pointer; text-align:center;">{{ i }}</button>
+            {% endfor %}
+
+          </div>
+        </div>
+        
+        <!-- Bottom Label -->
+        {% if scale_labels.min %}
+        <div style="background:#fff; border:2px solid #dc3545; border-radius:8px; padding:12px 20px; min-width:160px; text-align:center; font-weight:600; color:#dc3545; font-size:0.95rem;">
+          📍 {{ scale_labels.min }}
+        </div>
+        {% endif %}
       </div>
     </div>
     <div style="text-align:center; margin-top:0.5rem;">
       <output id="out" style="font-size:1.25rem; font-weight:800;">5</output>
     </div>
+    
     <input id="answer_input" type="hidden" name="answer" value="5">
   </div>
 
   <!-- No text/audio for Cantril template -->
 
-  <div style="margin-top:1rem; display:flex; gap:0.6rem; justify-content:center;">
+  <div class="survey-controls">
     <button class="btn" type="submit">Dalej</button>
   </div>
-</form>
+  </form>
+</div>
 
 {% if error %}
   <p style="color:red; margin-top:0.7rem;">{{ error }}</p>

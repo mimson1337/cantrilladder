@@ -14,8 +14,17 @@ class Patient(models.Model):
 
 
 class Survey(models.Model):
+    LADDER_DESIGNS = [
+        ('classic', 'Klasyczny - Niebieski gradient'),
+        ('gradient', 'Gradient - Dynamiczny'),
+        ('minimal', 'Minimalistyczny - Prosty'),
+        ('circular', 'Okrągły - Nowoczesny'),
+        ('modern', 'Nowoczesny - Śmiały'),
+    ]
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
+    ladder_design = models.CharField(max_length=20, choices=LADDER_DESIGNS, default='classic')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -27,6 +36,8 @@ class Question(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
     order = models.PositiveIntegerField()
+    # scale_labels: JSON in format {"min": "Bardzo słaby", "max": "Bardzo dobry"}
+    scale_labels = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ['order']
@@ -46,7 +57,8 @@ class PatientResponse(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='responses')
-    survey_id = models.CharField(max_length=100)  # JSON survey ID
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='responses', null=True, blank=True)
+    json_survey_id = models.CharField(max_length=100, null=True, blank=True)  # JSON survey ID (legacy)
     question_id = models.CharField(max_length=100) # ID pytania z JSON
 
     response_type = models.CharField(max_length=10, choices=RESPONSE_TYPE)
@@ -64,4 +76,4 @@ class PatientResponse(models.Model):
     is_processed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.patient.pesel} | {self.survey_id} | {self.question_id}"
+        return f"{self.patient.pesel} | {self.json_survey_id or self.survey.title if self.survey else 'N/A'} | {self.question_id}"

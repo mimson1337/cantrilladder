@@ -2,59 +2,66 @@
 {% block title %}Historia ankiet{% endblock %}
 
 {% block content %}
+  <div class="back-nav">
+    <a class="back-btn" href="{% url 'panel_home' %}">← Panel</a>
+  </div>
+
   <h2 class="center">Historia wypełnionych ankiet</h2>
-  <form method="get" style="max-width:920px; margin:0.5rem auto; display:flex; gap:8px; align-items:center;">
-    <button type="button" class="btn" onclick="location.href='{% url 'panel_home' %}'">← Panel</button>
-    <input name="q" value="{{ q }}" placeholder="PESEL / nazwa ankiety (np. 2025-12-29)" style="flex:1; padding:8px;" />
+  <form method="get" style="max-width:920px; margin:0.5rem auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:0 1rem; box-sizing:border-box;">
+    <input name="q" value="{{ q }}" placeholder="PESEL / nazwa ankiety (np. 2025-12-29)" style="flex:1 1 auto; padding:8px; min-width:80px; box-sizing:border-box;" />
     <button class="btn" type="submit">Szukaj</button>
   </form>
 
   <div style="max-width:1000px; margin:1rem auto;">
     {% for p in patients %}
-      <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; margin-bottom:12px; background:#fff;">
-        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
-          <div style="font-weight:800;">
-            <a href="{% url 'panel_patient_history' p.id %}">{{ p.pesel }}</a>
+      <div class="patient-card">
+        <div class="patient-header">
+          <div class="patient-info">
+            <div class="patient-pesel">
+              <a href="{% url 'panel_patient_history' p.id %}" style="color:#0b5ed7; text-decoration:none;">{{ p.pesel }}</a>
+            </div>
             {% if p.first_name or p.last_name %}
-              — {{ p.first_name }} {{ p.last_name }}
+              <div class="patient-name">{{ p.first_name }} {{ p.last_name }}</div>
             {% endif %}
+            <div class="patient-meta">Pacjent</div>
           </div>
-          <div style="color:#666; font-size:0.95rem;">Wypełnienia: {{ p.surveys|length }}</div>
+          <div style="text-align:right;">
+            <div style="font-size:1.5rem; font-weight:800; color:#0b5ed7;">{{ p.surveys|length }}</div>
+            <div style="font-size:0.85rem; color:#666;">ankiet(y) wypełnione(e)</div>
+          </div>
         </div>
 
-        <div style="margin-top:10px; overflow:auto;">
-          <table class="app-table" style="width:100%; min-width:760px;">
-            <thead>
-              <tr style="text-align:left; border-bottom:1px solid #e5e7eb;">
-                <th>Ankieta</th>
-                <th>Liczba odpowiedzi</th>
-                <th>Przetworzone</th>
-                <th>Pierwsza</th>
-                <th>Ostatnia</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for s in p.surveys %}
-                <tr style="border-bottom:1px solid #f3f4f6;">
-                  <td>{{ s.survey_label }}</td>
-                  <td>{{ s.responses_count }}</td>
-                  <td>{{ s.processed_count }} / {{ s.responses_count }}</td>
-                  <td>{{ s.first_response_at }}</td>
-                  <td>{{ s.last_response_at }}</td>
-                  <td style="text-align:right; white-space:nowrap;">
-                    <button type="button" class="btn" onclick="location.href='{% url 'panel_results' %}?pesel={{ p.pesel }}&survey_id={{ s.survey_id }}'">Szczegóły</button>
-                  </td>
-                </tr>
-              {% empty %}
-                <tr><td colspan="6" style="text-align:center; padding:10px;">Brak ankiet</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <div class="survey-items">
+          {% for s in p.surveys %}
+            <div class="survey-item">
+              <div class="survey-item-title">📋 {{ s.survey_label }}</div>
+              <div class="survey-item-detail">
+                <div class="detail-line">
+                  <span class="detail-label">Odpowiedzi</span>
+                  <span class="detail-value">{{ s.responses_count }}</span>
+                </div>
+                <div class="detail-line">
+                  <span class="detail-label">Przetworzone</span>
+                  <span class="detail-value">{{ s.processed_count }}/{{ s.responses_count }}</span>
+                </div>
+                <div class="detail-line">
+                  <span class="detail-label">Rozpoczęta</span>
+                  <span class="detail-value">{{ s.first_response_at }}</span>
+                </div>
+                <div class="detail-line">
+                  <span class="detail-label">Zakończona</span>
+                  <span class="detail-value">{{ s.last_response_at }}</span>
+                </div>
+              </div>
+              <button type="button" class="btn" onclick="location.href='{% url 'panel_results' %}?pesel={{ p.pesel }}&survey_id={{ s.survey_id }}'">Podgląd odpowiedzi →</button>
+            </div>
+          {% empty %}
+            <div style="text-align:center; padding:1rem; color:#999;">Brak ankiet</div>
+          {% endfor %}
         </div>
       </div>
     {% empty %}
-      <div style="text-align:center; padding:10px; color:#666;">Brak danych</div>
+      <div style="text-align:center; padding:2rem; color:#666; background:#f9f9f9; border-radius:8px;">Brak danych do wyświetlenia</div>
     {% endfor %}
   </div>
 {% endblock %}

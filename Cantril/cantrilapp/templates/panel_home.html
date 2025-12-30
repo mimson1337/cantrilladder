@@ -2,11 +2,43 @@
 {% block title %}Panel lekarza{% endblock %}
 
 {% block content %}
+  <div class="back-nav">
+    <a class="back-btn" href="{% url 'home' %}">← Powrót</a>
+  </div>
+
   <h2 class="center">Panel lekarza</h2>
-  <div style="text-align:center; margin-top:1.5rem; display:flex; gap:12px; justify-content:center; align-items:center;">
-    <button type="button" class="btn" onclick="location.href='{% url 'home' %}'">← Strona główna</button>
-    <a class="btn" href="{% url 'manage_questions' %}">Generator ankiety</a>
-    <a class="btn" href="{% url 'panel_results' %}" style="background:#2563eb; border-color:#2563eb;">Sprawdź odpowiedzi</a>
-    <a class="btn" href="{% url 'panel_history' %}">Historia ankiet</a>
+  
+  <div class="dashboard-grid">
+    <!-- Manage Questions -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-icon">⚙️</div>
+      <h3>Generator ankiety</h3>
+      <p>Zarządzaj pytaniami w ankiecie. Dodawaj nowe pytania i zmieniaj ich kolejność.</p>
+      <a class="btn" href="{% url 'manage_questions' %}">Otwórz</a>
+    </div>
+
+    <!-- Check Answers -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-icon">📋</div>
+      <h3>Sprawdź odpowiedzi</h3>
+      <p>Przeglądaj wszystkie odpowiedzi pacjentów. Filtruj po numerze PESEL.</p>
+      <a class="btn" href="{% url 'panel_results' %}">Otwórz</a>
+    </div>
+
+    <!-- Survey History -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-icon">📊</div>
+      <h3>Historia ankiet</h3>
+      <p>Sprawdzaj historię wypełnianych ankiet dla każdego pacjenta i ich postęp.</p>
+      <a class="btn" href="{% url 'panel_history' %}">Otwórz</a>
+    </div>
+
+    <!-- Ladder Design Settings -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-icon">🎨</div>
+      <h3>Designy drabiny</h3>
+      <p>Wybierz design drabiny Cantrila dla pacjentów. Przejrzyj wszystkie dostępne opcje.</p>
+      <a class="btn" href="{% url 'ladder_designs' %}">Konfiguruj</a>
+    </div>
   </div>
 {% endblock %}

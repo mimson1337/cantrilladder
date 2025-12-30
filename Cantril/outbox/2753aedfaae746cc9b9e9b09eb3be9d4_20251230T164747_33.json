@@ -1,0 +1,29 @@
+[
+  {
+    "patientID": "33",
+    "surveyID": "2753aedfaae746cc9b9e9b09eb3be9d4_20251230T164747",
+    "questionID": "q1",
+    "question": "PORUSZANIE SIĘ",
+    "responseType": "scale",
+    "scaleValue": 6,
+    "textAnswer": null
+  },
+  {
+    "patientID": "33",
+    "surveyID": "2753aedfaae746cc9b9e9b09eb3be9d4_20251230T164747",
+    "questionID": "q2",
+    "question": "SAMOOBSŁUGA",
+    "responseType": "scale",
+    "scaleValue": 8,
+    "textAnswer": null
+  },
+  {
+    "patientID": "33",
+    "surveyID": "2753aedfaae746cc9b9e9b09eb3be9d4_20251230T164747",
+    "questionID": "q3",
+    "question": "ZWYKŁE CZYNNOŚCI (np. praca, nauka, zajęcia domowe, aktywności rodzinne, zajęcia w czasie wolnym)",
+    "responseType": "scale",
+    "scaleValue": 8,
+    "textAnswer": null
+  }
+]

@@ -2,6 +2,11 @@
 {% block title %}Historia pacjenta{% endblock %}
 
 {% block content %}
+  <div class="back-nav">
+    <a class="back-btn" href="{% url 'panel_home' %}">← Panel</a>
+    <a class="back-btn" href="{% url 'panel_history' %}">← Historia</a>
+  </div>
+
   <h2 class="center">Historia pacjenta</h2>
 
   <div style="max-width:1000px; margin:0.5rem auto 0;">
@@ -13,8 +18,6 @@
         {% endif %}
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-        <button type="button" class="btn" onclick="location.href='{% url 'panel_home' %}'">← Panel</button>
-        <button type="button" class="btn" onclick="location.href='{% url 'panel_history' %}'">← Wróć do historii</button>
         <button type="button" class="btn" onclick="location.href='{% url 'panel_results' %}?pesel={{ patient.pesel }}'">Wszystkie odpowiedzi</button>
         <button type="button" class="btn" onclick="location.href='{% url 'admin:cantrilapp_patient_change' patient.id %}'">Edytuj w adminie</button>
       </div>
@@ -27,11 +30,6 @@
         Utworzono: {{ patient.created_at }}
       {% endif %}
     </div>
-
-    <form method="get" style="max-width:720px; margin:0.75rem 0; display:flex; gap:8px;">
-      <input name="survey" value="{{ survey }}" placeholder="Filtr: ankieta (np. fragment daty)" style="flex:1; padding:8px;" />
-      <button class="btn" type="submit">Filtruj</button>
-    </form>
 
     <div style="margin-top:10px; overflow:auto;">
       <table class="app-table" style="width:100%; min-width:760px;">
@@ -48,17 +46,17 @@
         <tbody>
           {% for s in surveys %}
             <tr style="border-bottom:1px solid #f3f4f6;">
-              <td>{{ s.survey_label }}</td>
+              <td>📊 {{ s.survey_display_title }}</td>
               <td>{{ s.responses_count }}</td>
               <td>{{ s.processed_count }} / {{ s.responses_count }}</td>
               <td>{{ s.first_response_at }}</td>
               <td>{{ s.last_response_at }}</td>
               <td style="text-align:right; white-space:nowrap;">
-                <button type="button" class="btn" onclick="location.href='{% url 'panel_results' %}?pesel={{ patient.pesel }}&survey_id={{ s.survey_id }}'">Szczegóły</button>
+                <button type="button" class="btn" onclick="location.href='{% url 'panel_survey_completions' s.survey.id patient.id %}'">Szczegóły</button>
               </td>
             </tr>
           {% empty %}
-            <tr><td colspan="6" style="text-align:center; padding:10px;">Brak danych</td></tr>
+            <tr><td colspan="6" style="text-align:center; padding:10px;">Brak wypełnionych ankiet</td></tr>
           {% endfor %}
         </tbody>
       </table>

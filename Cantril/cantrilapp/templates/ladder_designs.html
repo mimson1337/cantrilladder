@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Designy drabiny Cantrila{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 20px;">
+    
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+        <button type="button" class="btn" onclick="location.href='{% url 'panel_home' %}'">← Panel</button>
+        <h1 class="center" style="margin:0; flex:1;">Designy drabiny Cantrila</h1>
+    </div>
+    <p class="center" style="color: #666; margin-bottom: 30px;">
+        Wybierz ulubiony design drabiny. Będzie on stosowany dla wszystkich pacjentów.
+    </p>
+
+    <form method="POST" style="background: #f9f9f9; padding: 30px; border-radius: 8px; border: 1px solid #ddd;">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            {% for design_id, design_name, emoji in ladder_design_choices %}
+            <label style="cursor: pointer; padding: 20px; border: 3px solid {% if design_id == current_design %}#0b5ed7{% else %}#ddd{% endif %}; border-radius: 12px; text-align: center; transition: all 0.3s ease; background: {% if design_id == current_design %}#f0f8ff{% else %}#fff{% endif %};" onmouseover="this.style.borderColor='#0b5ed7'; this.style.background='#f0f8ff';" onmouseout="this.style.borderColor='{% if design_id == current_design %}#0b5ed7{% else %}#ddd{% endif %}'; this.style.background='{% if design_id == current_design %}#f0f8ff{% else %}#fff{% endif %}';">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">{{ emoji }}</div>
+                <input type="radio" name="ladder_design" value="{{ design_id }}" {% if design_id == current_design %}checked{% endif %} style="margin-right: 8px;">
+                <div style="font-weight: 700; margin-top: 10px; font-size: 1rem;">{{ design_name }}</div>
+                
+                <!-- Mini preview of ladder -->
+                <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 4px; align-items: center;">
+                    <div class="ladder-design-{{ design_id }}" style="width: 80px; height: 150px; position: relative; margin: 0 auto;">
+                        <div style="position: absolute; left: 20px; top: 4px; bottom: 4px; width: 4px; background: #d0daf8; border-radius: 2px;"></div>
+                        <div style="position: absolute; right: 20px; top: 4px; bottom: 4px; width: 4px; background: #d0daf8; border-radius: 2px;"></div>
+                        <div style="position: relative; display: flex; flex-direction: column-reverse; gap: 4px; align-items: center; justify-content: space-between; height: 100%; padding: 6px 0;">
+                            <button type="button" class="ladder-step" disabled style="width: 60px; height: 14px; border-radius: 4px; background: #fff; border: 1px solid #d0daf8; cursor: not-allowed; font-size: 0.7rem;">1</button>
+                            <button type="button" class="ladder-step" disabled style="width: 60px; height: 14px; border-radius: 4px; background: #fff; border: 1px solid #d0daf8; cursor: not-allowed; font-size: 0.7rem;">5</button>
+                            <button type="button" class="ladder-step" aria-checked="true" disabled style="width: 60px; height: 14px; border-radius: 4px; background: #fff; border: 1px solid #d0daf8; cursor: not-allowed; font-size: 0.7rem;">10</button>
+                        </div>
+                    </div>
+                </div>
+            </label>
+            {% endfor %}
+        </div>
+
+        <hr style="margin: 30px 0;">
+
+        <div style="text-align: center;">
+            <button type="submit" class="btn" style="padding: 15px 40px; font-size: 1.2rem;">
+                💾 Zastosuj design
+            </button>
+        </div>
+    </form>
+
+    <!-- Design description -->
+    <div style="margin-top: 40px; background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #0b5ed7;">
+        <h3 style="margin-top: 0; color: #0b5ed7;">ℹ️ O designach:</h3>
+        <ul style="color: #666; line-height: 1.8;">
+            <li><strong>Klasyczny</strong> - Tradycyjny design z niebieskim gradientem. Znany i sprawdzony.</li>
+            <li><strong>Gradient</strong> - Dynamiczny design z wibracją gradientu. Nowoczesny i żywy.</li>
+            <li><strong>Minimalistyczny</strong> - Prosty, minimalny design. Skoncentrowany na istocie.</li>
+            <li><strong>Okrągły</strong> - Nowoczesny design z okrągłymi przyciskami. Przyjazny użytkownikowi.</li>
+            <li><strong>Nowoczesny</strong> - Śmiały design z jasnobłękitnym kolorem. Świeży i energiczny.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

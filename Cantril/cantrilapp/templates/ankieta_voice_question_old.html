@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Pytanie {{ question_number }} / {{ total_questions }}{% endblock %}
+
+{% block content %}
+<h2 class="center">Pytanie {{ question_number }} / {{ total_questions }}</h2>
+<p style="font-size:1.15rem;">{{ question }}</p>
+
+<form method="post" enctype="multipart/form-data" id="voice_form" style="margin: 1.25rem auto; max-width:720px; padding:16px; border-radius:8px; background:#fbfbff; box-shadow:0 6px 18px rgba(18,38,72,0.06);">
+  {% csrf_token %}
+
+  <div style="font-weight:800; margin-bottom:6px;">Wybierz typ odpowiedzi</div>
+  <div class="mode-picker" style="margin-top:0; margin-bottom:12px;">
+    <div class="mode-option">
+      <input class="mode-radio" type="radio" name="response_type" id="response_audio" value="audio" checked>
+      <label class="mode-body" for="response_audio">
+        <span class="mode-title">Głosowo (nagranie)</span>
+        <span class="mode-desc">Nagraj odpowiedź mikrofonem. Po nagraniu kliknij „Następne”.</span>
+      </label>
+    </div>
+
+    <div class="mode-option">
+      <input class="mode-radio" type="radio" name="response_type" id="response_text" value="text">
+      <label class="mode-body" for="response_text">
+        <span class="mode-title">Tekstowa</span>
+        <span class="mode-desc">Wpisz odpowiedź w polu tekstowym. Następnie kliknij „Następne”.</span>
+      </label>
+    </div>
+  </div>
+
+  <div id="audio_div" style="display:flex; flex-direction:column; gap:8px;">
+    <p style="margin:0;">Użyj przycisku <strong>Start</strong>/<strong>Stop</strong>, aby nagrać odpowiedź. Kliknij "Następne" aby przejść dalej.</p>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button type="button" id="record_btn" class="btn">Start</button>
+      <div id="record_status" style="font-weight:600; color:#374151;">Nie nagrywasz</div>
+    </div>
+    <audio id="audio_preview" controls style="display:none; margin-top:0.5rem;"></audio>
+    <input type="file" name="audio_file" id="audio_file_input" style="display:none;">
+  </div>
+
+  <div id="text_div" style="display:none; margin-top:0.5rem;">
+    <textarea name="text_answer" rows="4" style="width:100%;"></textarea>
+  </div>
+
+  <div style="margin-top:1rem; display:flex; gap:0.6rem; justify-content:center;">
+    <button class="btn" type="submit">Następne</button>
+  </div>
+</form>
+
+{% if error %}
+  <p style="color:red; margin-top:0.7rem;">{{ error }}</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // --- Switch between audio and text ---
+  const audioDiv = document.getElementById('audio_div');
+  const textDiv = document.getElementById('text_div');
+  const radios = document.querySelectorAll("input[name='response_type']");
+
+  function syncResponseUI() {
+    const selected = document.querySelector("input[name='response_type']:checked");
+    const value = selected ? selected.value : 'audio';
+    audioDiv.style.display = value === 'audio' ? 'flex' : 'none';
+    textDiv.style.display = value === 'text' ? 'block' : 'none';
+  }
+
+  radios.forEach(r => r.addEventListener('change', syncResponseUI));
+  syncResponseUI();
+
+  // --- Audio recording auto-start on load ---
+  let mediaRecorder, audioChunks = [];
+  const recordBtn = document.getElementById('record_btn');
+  const audioPreview = document.getElementById('audio_preview');
+  const audioFileInput = document.getElementById('audio_file_input');
+  const form = document.getElementById('voice_form');
+
+  async function startRecording(){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = e => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const file = new File([blob], 'response.webm', { type: 'audio/webm' });
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        audioFileInput.files = dt.files;
+
+        audioPreview.src = URL.createObjectURL(blob);
+        audioPreview.style.display = 'block';
+      };
+      mediaRecorder.start();
+      recordBtn.textContent = 'Stop';
+      record_status.textContent = 'Nagrywasz...';
+    }catch(err){
+      console.warn('Brak dostępu do mikrofonu:', err);
+    }
+  }
+
+  const record_status = document.getElementById('record_status');
+
+  recordBtn.addEventListener('click', () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording'){
+      mediaRecorder.stop();
+      recordBtn.textContent = 'Start';
+      record_status.textContent = 'Zapisano nagranie';
+    } else {
+      startRecording();
+    }
+  });
+
+  // stop recording just before form submit to ensure file present
+  form.addEventListener('submit', (e) => {
+    if (mediaRecorder && mediaRecorder.state === 'recording'){
+      mediaRecorder.stop();
+      // allow onstop to populate the file input
+    }
+  });
+</script>
+{% endblock %}

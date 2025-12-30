@@ -12,7 +12,7 @@ class PatientAdmin(admin.ModelAdmin):
 class PatientResponseAdmin(admin.ModelAdmin):
     list_display = (
         'get_pesel',
-        'survey_id',        # zamiast 'survey'
+        'get_survey_title',
         'question_id',      # zamiast 'question'
         'response_type',
         'scale_value',
@@ -27,6 +27,11 @@ class PatientResponseAdmin(admin.ModelAdmin):
         return obj.patient.pesel
 
     get_pesel.short_description = 'PESEL'
+
+    def get_survey_title(self, obj):
+        return obj.survey.title if obj.survey else obj.json_survey_id
+
+    get_survey_title.short_description = 'Survey'
 
 
 

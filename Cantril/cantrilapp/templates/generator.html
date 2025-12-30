@@ -3,45 +3,143 @@
 {% block title %}Generator Ankiety{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<div style="max-width: 900px; margin: 0 auto; padding: 20px;">
     
     <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
         <button type="button" class="btn" onclick="location.href='{% url 'panel_home' %}'">← Panel</button>
-        <h1 class="center" style="margin:0; flex:1;">Generator Pytań</h1>
+        <h1 class="center" style="margin:0; flex:1;">Generator Ankiet</h1>
     </div>
     <p class="center" style="color: #666; margin-bottom: 30px;">
-        Tutaj możesz edytować pytania, które zobaczą pacjenci.
+        {% if mode == 'edit' %}
+            Edytujesz: <strong>{{ data.title }}</strong>
+        {% else %}
+            Utwórz nową ankietę lub edytuj istniejącą.
+        {% endif %}
     </p>
 
+    <!-- Survey List (for creating new or editing) -->
+    {% if mode != 'edit' %}
+    <div style="margin-bottom: 30px; background: #f0f8ff; padding: 20px; border-radius: 8px; border: 1px solid #b0d4ff;">
+        <h3 style="margin-top: 0;">Istniejące ankiety:</h3>
+        {% if surveys %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                {% for survey in surveys %}
+                <button type="button" class="btn" onclick="location.href='{% url 'manage_questions' %}?mode={{ survey.id }}'" 
+                        style="padding: 15px; text-align: left; white-space: normal; height: auto; line-height: 1.4;">
+                    📝 {{ survey.title|truncatechars:30 }}
+                </button>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: #666;">Brak istniejących ankiet.</p>
+        {% endif %}
+        
+        <div style="margin-top: 20px; border-top: 1px solid #b0d4ff; padding-top: 20px;">
+            <button type="button" class="btn" onclick="location.href='{% url 'manage_questions' %}?mode=new'" 
+                    style="background-color: #28a745; border-color: #28a745; padding: 12px 25px; font-size: 1rem;">
+                ➕ Utwórz nową ankietę
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Survey Form -->
     <form method="POST" style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
         {% csrf_token %}
         
+        <!-- Hidden field for survey UUID when editing -->
+        {% if edit_survey_uuid %}
+        <input type="hidden" name="survey_uuid" value="{{ edit_survey_uuid }}">
+        {% endif %}
+        
         <div style="margin-bottom: 25px;">
                  <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tytuł ankiety:</label>
-                 <input type="text" name="title" required value="{{ data.title|default:'Ankieta Cantrila' }}" 
+                 <input type="text" name="title" required value="{{ data.title|default:'' }}" 
                      style="width: 100%; padding: 10px; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
         </div>
+
+        <!-- Ladder Design Selector -->
+        <div style="margin-bottom: 25px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 10px;">Wybierz design drabiny Cantrila:</label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                <label style="cursor: pointer; padding: 12px; border: 2px solid #ccc; border-radius: 8px; text-align: center; transition: all 0.2s ease; background: #fff;" onmouseover="this.style.borderColor='#0b5ed7'; this.style.background='#f0f8ff';" onmouseout="this.style.borderColor='#ccc'; this.style.background='#fff';">
+                    <input type="radio" name="ladder_design" value="classic" {% if data.ladder_design == 'classic' or not data.ladder_design %}checked{% endif %} style="margin-right: 8px;">
+                    <div style="font-weight: 600; margin-top: 8px;">Klasyczny</div>
+                    <div style="font-size: 0.8rem; color: #666;">Niebieski gradient</div>
+                </label>
+                <label style="cursor: pointer; padding: 12px; border: 2px solid #ccc; border-radius: 8px; text-align: center; transition: all 0.2s ease; background: #fff;" onmouseover="this.style.borderColor='#0b5ed7'; this.style.background='#f0f8ff';" onmouseout="this.style.borderColor='#ccc'; this.style.background='#fff';">
+                    <input type="radio" name="ladder_design" value="gradient" {% if data.ladder_design == 'gradient' %}checked{% endif %} style="margin-right: 8px;">
+                    <div style="font-weight: 600; margin-top: 8px;">Gradient</div>
+                    <div style="font-size: 0.8rem; color: #666;">Dynamiczny</div>
+                </label>
+                <label style="cursor: pointer; padding: 12px; border: 2px solid #ccc; border-radius: 8px; text-align: center; transition: all 0.2s ease; background: #fff;" onmouseover="this.style.borderColor='#0b5ed7'; this.style.background='#f0f8ff';" onmouseout="this.style.borderColor='#ccc'; this.style.background='#fff';">
+                    <input type="radio" name="ladder_design" value="minimal" {% if data.ladder_design == 'minimal' %}checked{% endif %} style="margin-right: 8px;">
+                    <div style="font-weight: 600; margin-top: 8px;">Minimalistyczny</div>
+                    <div style="font-size: 0.8rem; color: #666;">Prosty</div>
+                </label>
+                <label style="cursor: pointer; padding: 12px; border: 2px solid #ccc; border-radius: 8px; text-align: center; transition: all 0.2s ease; background: #fff;" onmouseover="this.style.borderColor='#0b5ed7'; this.style.background='#f0f8ff';" onmouseout="this.style.borderColor='#ccc'; this.style.background='#fff';">
+                    <input type="radio" name="ladder_design" value="circular" {% if data.ladder_design == 'circular' %}checked{% endif %} style="margin-right: 8px;">
+                    <div style="font-weight: 600; margin-top: 8px;">Okrągły</div>
+                    <div style="font-size: 0.8rem; color: #666;">Nowoczesny</div>
+                </label>
+                <label style="cursor: pointer; padding: 12px; border: 2px solid #ccc; border-radius: 8px; text-align: center; transition: all 0.2s ease; background: #fff;" onmouseover="this.style.borderColor='#0b5ed7'; this.style.background='#f0f8ff';" onmouseout="this.style.borderColor='#ccc'; this.style.background='#fff';">
+                    <input type="radio" name="ladder_design" value="modern" {% if data.ladder_design == 'modern' %}checked{% endif %} style="margin-right: 8px;">
+                    <div style="font-weight: 600; margin-top: 8px;">Nowoczesny</div>
+                    <div style="font-size: 0.8rem; color: #666;">Śmiały</div>
+                </label>
+            </div>
+        </div>
         
-        <h3 style="border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">Pytania:</h3>
+        <h3 style="border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">Pytania: ({{ data.questions|length }} znalezionych)</h3>
         
         <div id="questions-container">
             {% for question in data.questions %}
-            <div class="question-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <input type="text" name="questions" value="{{ question.text|default:question }}" required
+            <div class="question-row" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;">
+                <input type="text" name="questions" value="{{ question.text }}" required
+                       placeholder="Wpisz treść pytania..."
                        style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                 
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="font-size: 0.9rem; font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Etykieta minimalna (dół 🔻):</label>
+                        <input type="text" name="scale_labels_min[]" value="{% if question.scale_labels %}{{ question.scale_labels.min }}{% endif %}" 
+                               placeholder="np. Najgorzej" 
+                               style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.9rem; font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Etykieta maksymalna (góra 🔺):</label>
+                        <input type="text" name="scale_labels_max[]" value="{% if question.scale_labels %}{{ question.scale_labels.max }}{% endif %}" 
+                               placeholder="np. Najlepiej" 
+                               style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+                    </div>
+                </div>
+                
                 <button type="button" class="btn" onclick="removeField(this)"
-                        style="background-color: #dc3545; border-color: #dc3545; padding: 0 20px;">
-                    Usuń
+                        style="background-color: #dc3545; border-color: #dc3545; padding: 0 20px; align-self: flex-end;">
+                    Usuń pytanie
                 </button>
             </div>
             {% empty %}
-            <div class="question-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div class="question-row" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;">
                 <input type="text" name="questions" placeholder="Wpisz treść pytania..." required
                        style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="font-size: 0.9rem; font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Etykieta minimalna (dół 🔻):</label>
+                        <input type="text" name="scale_labels_min[]" placeholder="np. Najgorzej" 
+                               style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.9rem; font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Etykieta maksymalna (góra 🔺):</label>
+                        <input type="text" name="scale_labels_max[]" placeholder="np. Najlepiej" 
+                               style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+                    </div>
+                </div>
+                
                 <button type="button" class="btn" onclick="removeField(this)"
-                        style="background-color: #dc3545; border-color: #dc3545; padding: 0 20px;">
-                    Usuń
+                        style="background-color: #dc3545; border-color: #dc3545; padding: 0 20px; align-self: flex-end;">
+                    Usuń pytanie
                 </button>
             </div>
             {% endfor %}
@@ -56,10 +154,20 @@
 
         <hr style="margin: 30px 0;">
 
-        <div style="text-align: center;">
+        <div style="text-align: center; display: flex; gap: 10px; justify-content: center;">
             <button type="submit" class="btn" style="padding: 15px 40px; font-size: 1.2rem;">
-                💾 Zapisz całą ankietę
+                {% if edit_survey_uuid %}
+                    💾 Zaktualizuj ankietę
+                {% else %}
+                    💾 Utwórz ankietę
+                {% endif %}
             </button>
+            {% if edit_survey_uuid %}
+            <button type="button" class="btn" onclick="location.href='{% url 'manage_questions' %}?mode=list'" 
+                    style="background-color: #6c757d; border-color: #6c757d; padding: 15px 40px; font-size: 1.2rem;">
+                ← Powrót do listy
+            </button>
+            {% endif %}
         </div>
     </form>
 </div>
@@ -68,47 +176,44 @@
     function addField() {
         const container = document.getElementById('questions-container');
         
-        // Tworzymy kontener rzędu (div)
         const div = document.createElement('div');
         div.className = 'question-row';
-        div.style.display = 'flex';
-        div.style.gap = '10px';
-        div.style.marginBottom = '10px';
+        div.style.cssText = 'display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;';
         
-        // Tworzymy input
         const input = document.createElement('input');
         input.type = 'text';
         input.name = 'questions';
         input.placeholder = 'Wpisz treść pytania...';
         input.required = true;
-        // Style inputa (muszą być takie same jak w HTML wyżej)
-        input.style.flexGrow = '1';
-        input.style.padding = '10px';
-        input.style.border = '1px solid #ccc';
-        input.style.borderRadius = '4px';
+        input.style.cssText = 'flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;';
         
-        // Tworzymy przycisk
+        const labelsDiv = document.createElement('div');
+        labelsDiv.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 10px;';
+        
+        const minDiv = document.createElement('div');
+        minDiv.innerHTML = '<label style="font-size: 0.9rem; font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Etykieta minimalna (dół 🔻):</label><input type="text" name="scale_labels_min[]" placeholder="np. Najgorzej" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">';
+        
+        const maxDiv = document.createElement('div');
+        maxDiv.innerHTML = '<label style="font-size: 0.9rem; font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Etykieta maksymalna (góra 🔺):</label><input type="text" name="scale_labels_max[]" placeholder="np. Najlepiej" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">';
+        
+        labelsDiv.appendChild(minDiv);
+        labelsDiv.appendChild(maxDiv);
+        
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'btn'; // Twoja klasa z base.html
-        btn.innerText = 'Usuń';
+        btn.className = 'btn';
+        btn.innerText = 'Usuń pytanie';
         btn.onclick = function() { removeField(btn); };
-        // Style przycisku (czerwony)
-        btn.style.backgroundColor = '#dc3545';
-        btn.style.borderColor = '#dc3545';
-        btn.style.padding = '0 20px';
-        btn.style.color = 'white';
-        btn.style.cursor = 'pointer';
+        btn.style.cssText = 'background-color: #dc3545; border-color: #dc3545; padding: 0 20px; color: white; cursor: pointer; align-self: flex-end;';
         
-        // Składamy całość
         div.appendChild(input);
+        div.appendChild(labelsDiv);
         div.appendChild(btn);
         container.appendChild(div);
     }
 
     function removeField(btn) {
-        // Usuwamy rząd, w którym jest przycisk
-        btn.parentElement.remove();
+        btn.closest('.question-row').remove();
     }
 </script>
 {% endblock %}

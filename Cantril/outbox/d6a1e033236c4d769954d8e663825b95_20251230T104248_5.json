@@ -1,0 +1,29 @@
+[
+  {
+    "patientID": "5",
+    "surveyID": "d6a1e033236c4d769954d8e663825b95_20251230T104248",
+    "questionID": "q1",
+    "question": "",
+    "responseType": "text",
+    "textAnswer": "Brak",
+    "audioFile": null
+  },
+  {
+    "patientID": "5",
+    "surveyID": "d6a1e033236c4d769954d8e663825b95_20251230T104248",
+    "questionID": "q2",
+    "question": "",
+    "responseType": "text",
+    "textAnswer": "No coś tam",
+    "audioFile": null
+  },
+  {
+    "patientID": "5",
+    "surveyID": "d6a1e033236c4d769954d8e663825b95_20251230T104248",
+    "questionID": "q3",
+    "question": "",
+    "responseType": "text",
+    "textAnswer": "Nie",
+    "audioFile": null
+  }
+]

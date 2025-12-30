@@ -1,0 +1,30 @@
+{
+    "title": "Rehabilitacja",
+    "ladder_design": "classic",
+    "questions": [
+        {
+            "id": "q1",
+            "text": "Czy czujesz dyskomfort podczas chodzenia?",
+            "scale_labels": {
+                "min": "Brak problemów z chodzeniem",
+                "max": "Trudności z chodzeniem"
+            }
+        },
+        {
+            "id": "q2",
+            "text": "Jak duży jest ból w biodrach?",
+            "scale_labels": {
+                "min": "Nieodczuwalny",
+                "max": "Nieznośny"
+            }
+        },
+        {
+            "id": "q3",
+            "text": "Jak bardzo kontuzja utrudnia codzienne funkcjonowanie?",
+            "scale_labels": {
+                "min": "Brak utrudnień",
+                "max": "Spore trudności"
+            }
+        }
+    ]
+}

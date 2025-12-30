@@ -1,0 +1,29 @@
+[
+  {
+    "patientID": "22",
+    "surveyID": "3898c58cb6bb429faec50b480519193f_20251230T120052",
+    "questionID": "q1",
+    "question": "",
+    "responseType": "audio",
+    "textAnswer": null,
+    "audioFile": "/audio_answers/672e585b59384bdd84daa51253c4cebd_response.webm"
+  },
+  {
+    "patientID": "22",
+    "surveyID": "3898c58cb6bb429faec50b480519193f_20251230T120052",
+    "questionID": "q2",
+    "question": "",
+    "responseType": "text",
+    "textAnswer": "Nie wiem",
+    "audioFile": null
+  },
+  {
+    "patientID": "22",
+    "surveyID": "3898c58cb6bb429faec50b480519193f_20251230T120052",
+    "questionID": "q3",
+    "question": "",
+    "responseType": "text",
+    "textAnswer": "Tak",
+    "audioFile": null
+  }
+]

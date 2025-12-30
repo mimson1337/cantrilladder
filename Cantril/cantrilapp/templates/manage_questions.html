@@ -25,7 +25,7 @@
           {% csrf_token %}
           <input type="hidden" name="question_id" value="{{ q.id }}">
           <input type="hidden" name="action" value="delete">
-          <button class="btn" type="submit" style="background:#dc3545;">Usuń</button>
+          <button class="btn btn-danger" type="submit">Usuń</button>
         </form>
       </li>
     {% empty %}

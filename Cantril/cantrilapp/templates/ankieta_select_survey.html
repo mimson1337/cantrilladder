@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Wybierz ankietę{% endblock %}
+
+{% block content %}
+  <div style="max-width: 700px; margin: 2rem auto; padding: 0 1rem;">
+    <h2 style="text-align: center;">Witaj, {{ patient.first_name|default:'Pacjencie' }}!</h2>
+    <p style="text-align: center; color: #666;">Wybierz ankietę do wypełnienia</p>
+
+    {% if surveys_with_history %}
+      <form method="post" id="survey-form">
+        {% csrf_token %}
+        <div style="display: grid; gap: 1rem;">
+          {% for item in surveys_with_history %}
+            <div style="padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
+                 onclick="selectSurvey('{{ item.survey.id }}', this);" 
+                 class="survey-card">
+              
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h3 style="margin: 0 0 0.5rem 0; color: #333;">{{ item.survey.title }}</h3>
+                  {% if item.last_completed %}
+                    <p style="margin: 0; font-size: 0.9rem; color: #999;">
+                      ✓ Ostatnio wypełniona: <strong>{{ item.last_completed|date:"d.m.Y o H:i" }}</strong>
+                    </p>
+                  {% else %}
+                    <p style="margin: 0; font-size: 0.9rem; color: #ccc;">
+                      ○ Nie wypełniona wcześniej
+                    </p>
+                  {% endif %}
+                </div>
+                <input type="radio" name="survey_uuid" value="{{ item.survey.id }}" 
+                       style="width: 20px; height: 20px; cursor: pointer;">
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Mode selection -->
+        <div style="margin-top: 2rem; padding: 1rem; background: #f5f5f5; border-radius: 8px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 1rem; color: #333;">
+            Wybierz tryb ankiety:
+          </label>
+          <div style="display: grid; gap: 0.5rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="mode" value="cantril" checked style="cursor: pointer;">
+              <span>📊 Skala Cantrila (Drabina)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="mode" value="voice" style="cursor: pointer;">
+              <span>🎙️ Wypowiedź głosowa / Tekst</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+          <button type="submit" style="padding: 0.75rem 2rem; font-size: 1.1rem; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s;">
+            Rozpocznij ankietę →
+          </button>
+        </div>
+      </form>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; background: #fff3cd; border-radius: 8px; border: 1px solid #ffc107;">
+        <p style="margin: 0; color: #856404;">
+          Brak dostępnych ankiet. Skontaktuj się z lekarzem.
+        </p>
+      </div>
+    {% endif %}
+
+    <div style="margin-top: 2rem; text-align: center;">
+      <a href="{% url 'ankieta_choice' %}" style="color: #007bff; text-decoration: none; font-size: 0.9rem;">
+        ← Powrót do wpisania PESEL
+      </a>
+    </div>
+  </div>
+
+  <style>
+    .survey-card:hover {
+      border-color: #007bff;
+      background: #f0f8ff;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+    }
+
+    .survey-card input[type="radio"]:checked {
+      accent-color: #007bff;
+    }
+  </style>
+
+  <script>
+    function selectSurvey(surveyId, element) {
+      // Select the radio button
+      const radio = element.querySelector('input[type="radio"]');
+      radio.checked = true;
+      
+      // Highlight the card
+      document.querySelectorAll('.survey-card').forEach(card => {
+        card.style.borderColor = '#e0e0e0';
+        card.style.background = 'white';
+      });
+      element.style.borderColor = '#007bff';
+      element.style.background = '#f0f8ff';
+    }
+
+    // Allow Enter key to submit form if survey is selected
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const form = document.getElementById('survey-form');
+        if (form && form.querySelector('input[name="survey_uuid"]:checked')) {
+          form.submit();
+        }
+      }
+    });
+  </script>
+{% endblock %}

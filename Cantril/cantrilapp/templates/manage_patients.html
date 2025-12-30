@@ -9,31 +9,32 @@
       {% csrf_token %}
       <label>PESEL</label>
       <input type="text" name="pesel" maxlength="11" required>
-      <label style="margin-top:0.5rem;">Imię</label>
+      <label>Imię</label>
       <input type="text" name="first_name">
-      <label style="margin-top:0.5rem;">Nazwisko</label>
+      <label>Nazwisko</label>
       <input type="text" name="last_name">
-      <label style="margin-top:0.5rem;">Data urodzenia</label>
+      <label>Data urodzenia</label>
       <input type="date" name="date_of_birth">
-      <div style="margin-top:0.6rem; text-align:center;">
-        <button class="btn" type="submit">Dodaj pacjenta</button>
-      </div>
+      <button class="btn" type="submit" style="width:100%; display:block; margin-top:0.5rem;">Dodaj pacjenta</button>
     </form>
   </div>
 
   <h3>Lista pacjentów</h3>
-  <ul>
+  <ul style="list-style:none; padding:0;">
     {% for p in patients %}
-      <li style="margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <strong>{{ p.pesel }}</strong> {% if p.first_name or p.last_name %}- {{ p.first_name }} {{ p.last_name }}{% endif %}
-          <div style="font-size:0.9rem; color:#666;">Utworzony: {{ p.created_at }}</div>
+      <li style="margin-bottom:0.8rem; display:flex; flex-direction:column; gap:0.6rem; padding:1rem; background:#f9f9f9; border-radius:8px;">
+        <div style="flex:1;">
+          <strong style="display:block;">{{ p.pesel }}</strong>
+          {% if p.first_name or p.last_name %}
+            <span style="display:block; margin-top:0.3rem;">{{ p.first_name }} {{ p.last_name }}</span>
+          {% endif %}
+          <div style="font-size:0.9rem; color:#666; margin-top:0.3rem;">Utworzony: {{ p.created_at }}</div>
         </div>
         <form method="post" style="margin:0;">
           {% csrf_token %}
           <input type="hidden" name="patient_id" value="{{ p.id }}">
           <input type="hidden" name="action" value="delete">
-          <button class="btn" type="submit" style="background:#dc3545;">Usuń</button>
+          <button class="btn" type="submit" style="background:#dc3545; width:100%; display:block;">Usuń</button>
         </form>
       </li>
     {% empty %}

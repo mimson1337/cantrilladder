@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block title %}Wypełnienia ankiety{% endblock %}
+
+{% block content %}
+  <div class="back-nav">
+    <a class="back-btn" href="{% url 'panel_home' %}">← Panel</a>
+    <a class="back-btn" href="{% url 'panel_patient_history' patient.id %}">← Historia pacjenta</a>
+  </div>
+
+  <h2 class="center">Wypełnienia ankiety</h2>
+
+  <div style="max-width:1000px; margin:0.5rem auto 0;">
+    <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
+      <div>
+        <div style="font-weight:800; font-size: 1.1rem;">📊 {{ survey.title }}</div>
+        <div style="color:#666; font-size:0.9rem; margin-top:4px;">
+          Pacjent: <strong>{{ patient.pesel }}</strong>
+          {% if patient.first_name or patient.last_name %}
+            — {{ patient.first_name }} {{ patient.last_name }}
+          {% endif %}
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+        <button type="button" class="btn" onclick="location.href='{% url 'admin:cantrilapp_patientresponse_changelist' %}?survey__id__exact={{ survey.id }}&patient__id__exact={{ patient.id }}'">
+          Pokaż w adminie
+        </button>
+      </div>
+    </div>
+
+    {% if completions %}
+      <div style="margin-top:1.5rem;">
+        {% for completion in completions %}
+          <div style="margin-bottom:1.5rem; padding:1rem; background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <div style="font-weight:600; color:#333;">
+                📅 {{ completion.completed_at_local }}
+              </div>
+              <div style="color:#666; font-size:0.9rem;">
+                {{ completion.responses|length }} odpowiedzi
+              </div>
+            </div>
+            
+            <table class="app-table" style="width:100%; font-size:0.9rem; margin-top:0.5rem;">
+              <thead>
+                <tr style="background:#f3f4f6;">
+                  <th style="text-align:left; padding:0.5rem;">Pytanie (ID)</th>
+                  <th style="text-align:left; padding:0.5rem;">Typ</th>
+                  <th style="text-align:center; padding:0.5rem;">Wynik</th>
+                  <th style="text-align:left; padding:0.5rem;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for response in completion.responses %}
+                  <tr style="border-top:1px solid #e5e7eb;">
+                    <td style="padding:0.5rem;">
+                      <small style="color:#666;">{{ response.question_text|truncatewords:10 }}</small><br>
+                      <code style="font-size:0.8rem; color:#999;">#{{ response.question_id }}</code>
+                    </td>
+                    <td style="padding:0.5rem;">
+                      <span style="display:inline-block; padding:2px 8px; background:#e0e7ff; color:#3730a3; border-radius:4px; font-size:0.8rem;">
+                        {% if response.response_type == 'scale' %}
+                          📊 Skala
+                        {% elif response.response_type == 'text' %}
+                          📝 Tekst
+                        {% elif response.response_type == 'audio' %}
+                          🎙️ Audio
+                        {% else %}
+                          {{ response.response_type }}
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td style="padding:0.5rem; text-align:center; font-weight:600;">
+                      {% if response.scale_value %}
+                        <span style="font-size:1.2rem; color:#047857;">{{ response.scale_value|floatformat:0 }}/10</span>
+                      {% elif response.text_answer %}
+                        <span style="color:#666; font-size:0.9rem;">{{ response.text_answer|truncatewords:5 }}</span>
+                      {% elif response.audio_file %}
+                        <div style="margin-bottom:0.5rem;">
+                          <a href="{{ response.audio_file.url }}" style="color:#0084ff; text-decoration:none;">🔊 Posłuchaj</a>
+                        </div>
+                        {% if response.evaluated_score %}
+                          <span style="font-size:1.2rem; color:#047857;">{{ response.evaluated_score|floatformat:1 }}/10</span>
+                        {% else %}
+                          <span style="color:#999; font-size:0.9rem;">Oczekiwanie na ocenę</span>
+                        {% endif %}
+                      {% else %}
+                        —
+                      {% endif %}
+                    </td>
+                    <td style="padding:0.5rem;">
+                      {% if response.is_processed %}
+                        <span style="display:inline-block; padding:2px 8px; background:#d1fae5; color:#065f46; border-radius:4px; font-size:0.8rem;">
+                          ✓ Przetworzony
+                        </span>
+                        {% if response.evaluated_score %}
+                          <br><small style="color:#666;">Wynik: {{ response.evaluated_score|floatformat:1 }}</small>
+                        {% endif %}
+                      {% else %}
+                        <span style="display:inline-block; padding:2px 8px; background:#fef3c7; color:#92400e; border-radius:4px; font-size:0.8rem;">
+                          ⏳ Oczekiwanie
+                        </span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="margin-top:1rem; padding:1rem; background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; text-align:center; color:#92400e;">
+        <p style="margin:0;">Pacjent nie wypełnił tej ankiety.</p>
+      </div>
+    {% endif %}
+
+    <div style="margin-top:2rem; text-align:center;">
+      <a href="{% url 'panel_patient_history' patient.id %}" style="color:#0084ff; text-decoration:none; font-size:0.9rem;">
+        ← Powrót do historii pacjenta
+      </a>
+    </div>
+  </div>
+
+  <style>
+    .app-table {
+      border-collapse: collapse;
+      background: white;
+    }
+    
+    .app-table thead {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+    
+    .app-table td, .app-table th {
+      border: 1px solid #e5e7eb;
+    }
+  </style>
+{% endblock %}
